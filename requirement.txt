@@ -1,0 +1,4 @@
+kivy>=2.0.0
+kivymd>=0.104.2
+kivy-garden.graph>=0.4.0
+paho-mqtt>=1.5.1

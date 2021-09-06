@@ -1,0 +1,264 @@
+#:import utils kivy.utils
+#:import os os
+
+<HoverGraph>
+    FloatLayout
+        pos_hint: {"center_x":.5, "center_y":.5}
+        size_hint: None, None
+        size: root.width - 20, root.height - 20
+        canvas.before:
+            Color:
+                rgba: utils.get_color_from_hex('#FFFFFFFF')
+            RoundedRectangle:
+                pos: self.pos
+                size: self.size
+        BoxLayout:
+            id: graph_plot
+            pos_hint: {"center_x":.5, "center_y":.5}
+            size_hint: 1 , 1
+        BoxLayout:
+            id: hover_plot
+            pos_hint: {"center_x":.5, "center_y":.5}
+            size_hint: 1 , 1
+        BoxLayout:
+            id: tooltips
+            orientation: 'vertical'
+            size_hint: None, None
+            pos: 100, 100
+            size: 170, 100
+            canvas.before:
+                Color:
+                    rgba: utils.get_color_from_hex('#000000CC')
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+            MDLabel:
+                id: accuracy_tip
+                pos_hint:{'x': .05, 'center_y': .5}
+                theme_text_color: "Custom"
+                text_color: 1,1,1,1
+                font_name: 'asset/fonts/tway_air.ttf'
+                markup: True
+            MDLabel:
+                id: val_accuracy_tip
+                pos_hint:{'x': .05, 'center_y': .5}
+                theme_text_color: "Custom"
+                text_color: 1,1,1,1
+                font_name: 'asset/fonts/tway_air.ttf'
+                markup: True
+            MDLabel:
+                id: loss_tip
+                pos_hint:{'x': .05, 'center_y': .5}
+                theme_text_color: "Custom"
+                text_color: 1,1,1,1
+                font_name: 'asset/fonts/tway_air.ttf'
+                markup: True
+            MDLabel:
+                id: val_loss_tip
+                pos_hint:{'x': .05, 'center_y': .5}
+                theme_text_color: "Custom"
+                text_color: 1,1,1,1
+                font_name: 'asset/fonts/tway_air.ttf'
+                markup: True
+        FloatLayout:
+            id: idx_legend
+            size_hint: None, None
+            size: 120, 40
+            pos: graph_plot.x + graph_plot.width - 130, graph_plot.y + graph_plot.height - 50
+            canvas.before:
+                Color:
+                    rgba: utils.get_color_from_hex('#000000CC')
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+            MDLabel:
+                id: idx_legend_label
+                size: 120, 40
+                pos: idx_legend.x + 10, idx_legend.y
+                #pos_hint:{'center_x': .5, 'center_y': .5}
+                theme_text_color: "Custom"
+                text_color: 1,1,1,1
+                font_name: 'asset/fonts/tway_air.ttf'
+                markup: True
+        BoxLayout:
+            id: legend
+            orientation: 'vertical'
+            size_hint: None, None
+            size: 125, 80
+            pos: graph_plot.x + graph_plot.width - 135, graph_plot.y + graph_plot.height - 90
+            canvas.before:
+                Color:
+                    rgba: utils.get_color_from_hex('#000000CC')
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+            MDLabel:
+                text: "[color=3B689B]●[/color] Accuracy"
+                pos_hint:{'x': .05, 'center_y': .5}
+                theme_text_color: "Custom"
+                text_color: 1,1,1,1
+                font_name: 'asset/fonts/tway_air.ttf'
+                font_size: 14
+                markup: True
+            MDLabel:
+                text: "[color=16A364]●[/color] Val Accuracy"
+                pos_hint:{'x': .05, 'center_y': .5}
+                theme_text_color: "Custom"
+                text_color: 1,1,1,1
+                font_name: 'asset/fonts/tway_air.ttf'
+                font_size: 14
+                markup: True
+            MDLabel:
+                text: "[color=fc444f]●[/color] Loss"
+                pos_hint:{'x': .05, 'center_y': .5}
+                theme_text_color: "Custom"
+                text_color: 1,1,1,1
+                font_name: 'asset/fonts/tway_air.ttf'
+                font_size:14
+                markup: True
+            MDLabel:
+                text: "[color=f5aa31]●[/color] Val Loss"
+                pos_hint:{'x': .05, 'center_y': .5}
+                theme_text_color: "Custom"
+                text_color: 1,1,1,1
+                font_name: 'asset/fonts/tway_air.ttf'
+                font_size: 14
+                markup: True
+
+
+
+<DashboardScreen>
+    MDToolbar:
+        id: toolbar
+        pos_hint: {"right": 1, "top": 1}
+        elevation: 10
+        title: "DeepMom"
+        height: 50
+        right_action_items: [["dots-vertical"]]
+
+        md_bg_color: utils.get_color_from_hex('#C2E2C380')
+        #md_bg_color: utils.get_color_from_hex('#1EB9B9FF')
+    FloatLayout:
+        id: base_canvas
+        size_hint: None, None
+        size: root.width, root.height - 50
+        canvas.before:
+            Color:
+                rgba: utils.get_color_from_hex('#F4F4F6')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        FloatLayout:
+            id: info_canvas_base
+            pos_hint: {"x": 0, "top":1}
+            size_hint: 1, .25
+            MDFloatLayout:
+                id: info_canvas
+                pos: info_canvas_base.x + 10 , info_canvas_base.y
+                size_hint: None, None
+                size: info_canvas_base.width - 20, info_canvas_base.height - 10
+
+                MDLabel:
+                    id: accuracy_info
+                    pos_hint: {"x": 0, "top": 1}
+                    size_hint: None, None
+                    size: (info_canvas.width-50)/6, info_canvas.height
+
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#3B689BFF')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                        Color:
+                            rgba: utils.get_color_from_hex('#FFFFFFFF')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.width, self.height/1.3
+                            radius: [(0.0, 0.0), (0.0, 0.0), (10.0, 10.0), (10.0, 10.0)]
+                MDLabel:
+                    id: val_accuracy_info
+                    pos: accuracy_info.x + self.width + 10, info_canvas.y
+                    size_hint: None, None
+                    size: (info_canvas.width-50)/6, info_canvas.height
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#16A364FF')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                        Color:
+                            rgba: utils.get_color_from_hex('#FFFFFFFF')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.width, self.height/1.3
+                            radius: [(0.0, 0.0), (0.0, 0.0), (10.0, 10.0), (10.0, 10.0)]
+                MDLabel:
+                    id: loss_info
+                    pos: val_accuracy_info.x + self.width + 10, info_canvas.y
+                    size_hint: None, None
+                    size: (info_canvas.width-50)/6, info_canvas.height
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#FC444FFF')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                        Color:
+                            rgba: utils.get_color_from_hex('#FFFFFFFF')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.width, self.height/1.3
+                            radius: [(0.0, 0.0), (0.0, 0.0), (10.0, 10.0), (10.0, 10.0)]
+                MDLabel:
+                    id: val_loss_info
+                    pos: loss_info.x + self.width + 10, info_canvas.y
+                    size_hint: None, None
+                    size: (info_canvas.width-50)/6, info_canvas.height
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#F5AA31FF')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                        Color:
+                            rgba: utils.get_color_from_hex('#FFFFFFFF')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.width, self.height/1.3
+                            radius: [(0.0, 0.0), (0.0, 0.0), (10.0, 10.0), (10.0, 10.0)]
+                MDLabel:
+                    id: ETA
+                    pos: val_loss_info.x + self.width + 10, info_canvas.y
+                    size_hint: None, None
+                    size: (info_canvas.width-50)/6, info_canvas.height
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#FFFFFFFF')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [(10.0, 10.0), (10.0, 10.0), (10.0, 10.0), (10.0, 10.0)]
+                FloatLayout:
+                    id: progress
+                    pos: ETA.x + self.width + 10, info_canvas.y
+                    size_hint: None, None
+                    size: (info_canvas.width-50)/6, info_canvas.height
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#FFFFFFFF')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+        FloatLayout:
+            id: hover_graph_canvas
+            pos_hint: {"x": 0, "y":0}
+            size_hint: 1, .75
+            canvas.before:
+                Color:
+                    rgba: utils.get_color_from_hex('#00000000')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+
