@@ -23,7 +23,6 @@ class HoverGraph(FloatLayout, ThemableBehavior, HoverBehavior):
     def __init__(self, epoch=500, **kwargs):
         super(HoverGraph, self).__init__(**kwargs)
         Window.bind(mouse_pos=self.mouse_pos)
-        Window.bind(on_resize=self.on_resize)
         self.enter_flag = False
         self.touch_flag = False
         self.epoch = epoch
@@ -31,18 +30,17 @@ class HoverGraph(FloatLayout, ThemableBehavior, HoverBehavior):
 
         self.graph = Graph(x_ticks_minor=5, x_ticks_major=self.epoch / 10, y_ticks_major=1.5 / 6, y_grid_label=True, x_grid_label=True,
                            border_color=(0, 0, 0, 0), tick_color=(0, 0, 0, .5), font_size=12, padding=10,
-                           label_options={"color": utils.get_color_from_hex("#000000FF"), "font_name": "asset/fonts/tway_air.ttf"},
+                           label_options={"color": utils.get_color_from_hex("#000000FF"), "font_name": "asset/fonts/PretendardVariable.ttf"},
                            x_grid=False, y_grid=True, xmin=0, xmax=self.epoch, ymin=0, ymax=1.5, draw_border=False)
-
-        # self.accuracy_plot = LinePlot(color=utils.get_color_from_hex('#61A0FCCC'), line_width=1.2)
-        # self.loss_plot = LinePlot(color=utils.get_color_from_hex('#69973CCC'), line_width=1.2)
-        # self.val_accuracy_plot = LinePlot(color=utils.get_color_from_hex('#FFC727CC'), line_width=1.2)
-        # self.val_loss_plot = LinePlot(color=utils.get_color_from_hex('#CC2500CC'), line_width=1.2)
 
         self.accuracy_plot = SmoothLinePlot(color=utils.get_color_from_hex('#3B689BCC'))
         self.val_accuracy_plot = SmoothLinePlot(color=utils.get_color_from_hex('#16A364CC'))
         self.loss_plot = SmoothLinePlot(color=utils.get_color_from_hex('##FC444FCC'))
         self.val_loss_plot = SmoothLinePlot(color=utils.get_color_from_hex('#F5AA31CC'))
+        self.accuracy_plot.points = [(0, 0)]
+        self.val_accuracy_plot.points = [(0, 0)]
+        self.loss_plot.points = [(0, 0)]
+        self.val_loss_plot.points = [(0, 0)]
 
         self.graph.add_plot(self.accuracy_plot)
         self.graph.add_plot(self.val_accuracy_plot)
@@ -50,22 +48,17 @@ class HoverGraph(FloatLayout, ThemableBehavior, HoverBehavior):
         self.graph.add_plot(self.val_loss_plot)
         self.ids.graph_plot.add_widget(self.graph)
 
-        # self.accuracy_plot.points = [(i, random()) for i in range(0, self.current_epoch)]
-        # self.val_accuracy_plot.points = [(i, random()) for i in range(0, self.current_epoch)]
-        # self.loss_plot.points = [(i, random() * 1.5) for i in range(0, self.current_epoch)]
-        # self.val_loss_plot.points = [(i, random() * 1.5) for i in range(0, self.current_epoch)]
-
         self.half_graph_padding = self.graph.padding / 2
         self.ids.tooltips.opacity = 0
+
+        self._using_validation = True
+        self.plot_dict = {0: self.accuracy_plot, 1: self.loss_plot, 2: self.val_accuracy_plot, 3: self.val_loss_plot}
 
         # TODO check the size
         self.offset_x = 10
         self.offset_y = 10
 
     def draw_line(self, mouse_pos):
-
-        plot_dict = {0: self.accuracy_plot, 1: self.loss_plot, 2: self.val_accuracy_plot, 3: self.val_loss_plot}
-        # plot_dict = {0: self.accuracy_plot}
         graph_x_start = self.offset_x + self.graph.view_pos[0]
         graph_x_end = graph_x_start + self.graph.view_size[0]
         graph_y_start = self.offset_y + self.graph.view_pos[1]
@@ -77,22 +70,26 @@ class HoverGraph(FloatLayout, ThemableBehavior, HoverBehavior):
             step = self.graph.view_size[0] / self.epoch
             with self.ids.hover_plot.canvas:
                 idx = round((mouse_pos[0] - graph_x_start) / step)
-                if idx < self.current_epoch:
+                if idx <= self.current_epoch:
                     if self.touch_flag:
-                        for value in plot_dict.values():
+                        for value in self.plot_dict.values():
                             y_len = ((value.points[idx][1] * self.graph.view_size[1]) / self.graph.ymax) + graph_y_start
                             x_len = (step * idx) + graph_x_start
-                            Color(.15, .15, .15, .8)
-                            Line(circle=(x_len, y_len, 3), width=1.5)
+                            if self.graph.ymin <= value.points[idx][1] <= self.graph.ymax:
+                                Color(.15, .15, .15, .8)
+                                Line(circle=(x_len, y_len, 3), width=1.5)
                         if idx < self.epoch * .85:
                             self.ids.tooltips.pos = (mouse_pos[0] + 15, mouse_pos[1] - 55)
                         else:
                             self.ids.tooltips.pos = (mouse_pos[0] - self.ids.tooltips.width - 15, mouse_pos[1] - 55)
 
                         self.ids.accuracy_tip.text = '[color=3B689B]●[/color] Acc: ' + str(round(self.accuracy_plot.points[idx][1], 6))
-                        self.ids.val_accuracy_tip.text = '[color=16A364]●[/color] ValAcc: ' + str(round(self.val_accuracy_plot.points[idx][1], 6))
                         self.ids.loss_tip.text = '[color=fc444f]●[/color] Loss: ' + str(round(self.loss_plot.points[idx][1], 6))
-                        self.ids.val_loss_tip.text = '[color=f5aa31]●[/color] ValLoss: ' + str(round(self.val_loss_plot.points[idx][1], 6))
+
+                        if self._using_validation:
+                            self.ids.val_accuracy_tip.text = '[color=16A364]●[/color] ValAcc: ' + str(round(self.val_accuracy_plot.points[idx][1], 6))
+                            self.ids.val_loss_tip.text = '[color=f5aa31]●[/color] ValLoss: ' + str(round(self.val_loss_plot.points[idx][1], 6))
+
                         self.ids.idx_legend_label.text = 'Index: ' + str(idx)
                         self.ids.tooltips.opacity = 1
                         self.ids.idx_legend.opacity = 1
@@ -136,9 +133,16 @@ class HoverGraph(FloatLayout, ThemableBehavior, HoverBehavior):
         Window.set_system_cursor('arrow')
         self.enter_flag = False
 
-    def on_resize(self, *args):
-        self.offset_x = 10
-        self.offset_y = 10
+    def not_validation(self):
+        self._using_validation = False
+        self.plot_dict = {0: self.accuracy_plot, 1: self.loss_plot}
+        self.ids.legend_val_acc.text_color = utils.get_color_from_hex('#CCCCCCCC')
+        self.ids.legend_val_loss.text_color = utils.get_color_from_hex('#CCCCCCCC')
+        self.ids.legend_val_acc.text = "[color=16A364]✖[/color] Val Accuracy"
+        self.ids.legend_val_loss.text = "[color=f5aa31]✖[/color] Val Loss"
+        self.ids.tooltips.remove_widget(self.ids.val_accuracy_tip)
+        self.ids.tooltips.remove_widget(self.ids.val_loss_tip)
+        self.ids.tooltips.height = self.ids.tooltips.height / 2
 
 
 if __name__ == '__main__':

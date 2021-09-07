@@ -3,15 +3,15 @@
 
 <HoverGraph>
     FloatLayout
-        pos_hint: {"center_x":.5, "center_y":.5}
+        pos: 10, 10
         size_hint: None, None
-        size: root.width - 20, root.height - 20
+        size: root.width - 20, root.height - 35
         canvas.before:
             Color:
                 rgba: utils.get_color_from_hex('#FFFFFFFF')
             RoundedRectangle:
                 pos: self.pos
-                size: self.size
+                size: root.width - 20, root.height - 20
         BoxLayout:
             id: graph_plot
             pos_hint: {"center_x":.5, "center_y":.5}
@@ -85,7 +85,7 @@
             orientation: 'vertical'
             size_hint: None, None
             size: 125, 80
-            pos: graph_plot.x + graph_plot.width - 135, graph_plot.y + graph_plot.height - 90
+            pos: graph_plot.x + graph_plot.width - 135, graph_plot.y + graph_plot.height - 75
             canvas.before:
                 Color:
                     rgba: utils.get_color_from_hex('#000000CC')
@@ -93,6 +93,7 @@
                     pos: self.pos
                     size: self.size
             MDLabel:
+                id: legend_acc
                 text: "[color=3B689B]●[/color] Accuracy"
                 pos_hint:{'x': .05, 'center_y': .5}
                 theme_text_color: "Custom"
@@ -101,6 +102,7 @@
                 font_size: 14
                 markup: True
             MDLabel:
+                id: legend_val_acc
                 text: "[color=16A364]●[/color] Val Accuracy"
                 pos_hint:{'x': .05, 'center_y': .5}
                 theme_text_color: "Custom"
@@ -109,6 +111,7 @@
                 font_size: 14
                 markup: True
             MDLabel:
+                id: legend_loss
                 text: "[color=fc444f]●[/color] Loss"
                 pos_hint:{'x': .05, 'center_y': .5}
                 theme_text_color: "Custom"
@@ -117,6 +120,7 @@
                 font_size:14
                 markup: True
             MDLabel:
+                id: legend_val_loss
                 text: "[color=f5aa31]●[/color] Val Loss"
                 pos_hint:{'x': .05, 'center_y': .5}
                 theme_text_color: "Custom"
@@ -124,8 +128,6 @@
                 font_name: 'asset/fonts/tway_air.ttf'
                 font_size: 14
                 markup: True
-
-
 
 <DashboardScreen>
     MDToolbar:

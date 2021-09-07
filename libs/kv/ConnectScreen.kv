@@ -125,8 +125,14 @@
                 MDTextField:
                     id: mqtt_topic
                     hint_text: ""
-                    pos_hint: {"center_x":.5, "center_y":.425}
-                    size_hint_x: .8
+                    pos_hint: {"x":.05, "center_y":.425}
+                    size_hint_x: .65
+                    line_color_focus: utils.get_color_from_hex('#158585FF')
+                MDTextField:
+                    id: epoch
+                    hint_text: ""
+                    pos_hint: {"right":.95, "center_y":.425}
+                    size_hint_x: .2
                     line_color_focus: utils.get_color_from_hex('#158585FF')
         MDFloatLayout:
             pos_hint: {'right': .92, 'y': .01}

@@ -10,6 +10,7 @@ from kivy.lang import Builder
 from time import sleep
 from queue import Queue
 from threading import Thread
+import json
 
 import paho.mqtt.client as mqtt
 
@@ -48,8 +49,9 @@ class DeepMomApp(MDApp):
         self._scree_manager.add_widget(self._connect_screen)
         self._scree_manager.add_widget(self._dashboard_screen)
         self._client.on_connect = self.on_connect
-        self._client.on_subscribe = self.on_subscribe
-        self.icon = 'asset/images/logo_128.png'
+        self._client.on_message = self.on_message
+        self.check_validation = False
+        self._validation = True
 
     def build(self):
         Window.size = (1200, 628)
@@ -70,9 +72,11 @@ class DeepMomApp(MDApp):
                     self._connect_screen_in_queue.put(DMRes(DMRes_state.CONNECT_CANCEL))
                     del self._connect_req_thread
                 elif requset.request_state == DMReq_state.SUBSCRIBE_REQUEST:
-                    self._client.subscribe(requset.args)
+                    self._client.subscribe(requset.args[0])
+                    self._dashboard_screen.hover_graph.graph.xmax = int(requset.args[1])
+                    self._dashboard_screen.hover_graph.epoch = int(requset.args[1])
+                    self._scree_manager.current = 'dashboard'
                     self._broker_connection_subscribe_flag = True
-                    #del self._connect_req_thread
                 else:
                     sleep(.1)
             else:
@@ -94,15 +98,32 @@ class DeepMomApp(MDApp):
 
     def on_connect(self, client, userdata, flags, rc):
         self._connect_screen_in_queue.put(DMRes(DMRes_state.CONNECT_OK))
-        # self._mq_client.on_message = self.on_message
 
     def on_message(self, client, userdata, msg):
-        pass
-        # learn_curve = json.loads(msg.payload.decode('utf-8'))
-        # print("{}/1000".format(self.plot_screen.epoch))
+        learn_curve = json.loads(msg.payload.decode('utf-8'))
 
-    def on_subscribe(self, client, userdata, mid, granted_qos):
-        self._scree_manager.current = 'dashboard'
+        if not self.check_validation:
+            if not ("val_accuracy" in learn_curve and "val_loss" in learn_curve):
+                self._dashboard_screen.hover_graph.not_validation()
+                self._validation = False
+            self.check_validation = True
+
+        self._dashboard_screen.hover_graph.current_epoch += 1
+
+        if self._validation:
+            self._dashboard_screen.hover_graph.accuracy_plot.points.append((self._dashboard_screen.hover_graph.current_epoch,
+                                                                            learn_curve['accuracy']))
+            self._dashboard_screen.hover_graph.loss_plot.points.append((self._dashboard_screen.hover_graph.current_epoch,
+                                                                        learn_curve['loss']))
+            self._dashboard_screen.hover_graph.val_accuracy_plot.points.append((self._dashboard_screen.hover_graph.current_epoch,
+                                                                                learn_curve['val_accuracy']))
+            self._dashboard_screen.hover_graph.val_loss_plot.points.append((self._dashboard_screen.hover_graph.current_epoch,
+                                                                            learn_curve['val_loss']))
+        else:
+            self._dashboard_screen.hover_graph.accuracy_plot.points.append((self._dashboard_screen.hover_graph.current_epoch,
+                                                                            learn_curve['accuracy']))
+            self._dashboard_screen.hover_graph.loss_plot.points.append((self._dashboard_screen.hover_graph.current_epoch,
+                                                                        learn_curve['loss']))
 
 
 if __name__ == '__main__':
