@@ -5,8 +5,11 @@ from pathlib import Path
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager
 from kivy.core.window import Window
+from kivy.clock import Clock
 from kivy.lang import Builder
 
+from datetime import datetime
+from datetime import timedelta
 from time import sleep
 from queue import Queue
 from threading import Thread
@@ -51,13 +54,15 @@ class DeepMomApp(MDApp):
         self._client.on_connect = self.on_connect
         self._client.on_message = self.on_message
         self.check_validation = False
-        self._validation = True
-
-    def build(self):
-        Window.size = (1200, 628)
-        self._connection_damon_thread.start()
-        self._scree_manager.current = 'connect'
-        return self._scree_manager
+        self._using_validation = True
+        self.finish_flag = False
+        self.previous_time = timedelta(seconds=0)
+        self.ETA_time = timedelta(seconds=0)
+        self._info_dict = {"max_acc": 0, "min_loss": 0, "max_val_acc": 0, "min_val_loss": 0}
+        self._learn_curve_parameter = {"accuracy": self._dashboard_screen.hover_graph.accuracy_plot,
+                                       "loss": self._dashboard_screen.hover_graph.loss_plot,
+                                       "val_accuracy": self._dashboard_screen.hover_graph.val_accuracy_plot,
+                                       "val_loss": self._dashboard_screen.hover_graph.val_loss_plot}
 
     def connection_damon(self):
         while not self._broker_connection_subscribe_flag:
@@ -74,7 +79,9 @@ class DeepMomApp(MDApp):
                 elif requset.request_state == DMReq_state.SUBSCRIBE_REQUEST:
                     self._client.subscribe(requset.args[0])
                     self._dashboard_screen.hover_graph.graph.xmax = int(requset.args[1])
+                    self._dashboard_screen.hover_graph.graph.x_ticks_major = int(requset.args[1]) / 10
                     self._dashboard_screen.hover_graph.epoch = int(requset.args[1])
+                    self._dashboard_screen.ids.progress_epochs.text = "0 / {} Epochs".format(requset.args[1])
                     self._scree_manager.current = 'dashboard'
                     self._broker_connection_subscribe_flag = True
                 else:
@@ -101,29 +108,96 @@ class DeepMomApp(MDApp):
 
     def on_message(self, client, userdata, msg):
         learn_curve = json.loads(msg.payload.decode('utf-8'))
+        time_freq = datetime.now() - self.previous_time
+        self.previous_time = datetime.now()
 
         if not self.check_validation:
+            time_freq = timedelta(0)
+            self._dashboard_screen.ids.remain_time.text = 'Calc...'
             if not ("val_accuracy" in learn_curve and "val_loss" in learn_curve):
                 self._dashboard_screen.hover_graph.not_validation()
-                self._validation = False
+                self._using_validation = False
+                self._learn_curve_parameter.clear()
+                self._learn_curve_parameter = {"accuracy": self._dashboard_screen.hover_graph.accuracy_plot,
+                                               "loss": self._dashboard_screen.hover_graph.loss_plot}
+            else:
+                self._info_dict["max_val_acc"] = learn_curve["val_accuracy"]
+                self._info_dict["min_val_loss"] = learn_curve["val_loss"]
+                self._dashboard_screen.ids.max_val_acc.text = str(round(learn_curve["val_accuracy"], 4))
+                self._dashboard_screen.ids.min_val_loss.text = str(round(learn_curve["val_loss"], 4))
+                self._using_validation = True
+
+            self._info_dict["max_acc"] = learn_curve["accuracy"]
+            self._info_dict["min_loss"] = learn_curve["loss"]
+            self._dashboard_screen.ids.max_acc.text = str(round(self._info_dict["max_acc"], 4))
+            self._dashboard_screen.ids.min_loss.text = str(round(self._info_dict["min_loss"], 4))
             self.check_validation = True
 
         self._dashboard_screen.hover_graph.current_epoch += 1
 
-        if self._validation:
-            self._dashboard_screen.hover_graph.accuracy_plot.points.append((self._dashboard_screen.hover_graph.current_epoch,
-                                                                            learn_curve['accuracy']))
-            self._dashboard_screen.hover_graph.loss_plot.points.append((self._dashboard_screen.hover_graph.current_epoch,
-                                                                        learn_curve['loss']))
-            self._dashboard_screen.hover_graph.val_accuracy_plot.points.append((self._dashboard_screen.hover_graph.current_epoch,
-                                                                                learn_curve['val_accuracy']))
-            self._dashboard_screen.hover_graph.val_loss_plot.points.append((self._dashboard_screen.hover_graph.current_epoch,
-                                                                            learn_curve['val_loss']))
-        else:
-            self._dashboard_screen.hover_graph.accuracy_plot.points.append((self._dashboard_screen.hover_graph.current_epoch,
-                                                                            learn_curve['accuracy']))
-            self._dashboard_screen.hover_graph.loss_plot.points.append((self._dashboard_screen.hover_graph.current_epoch,
-                                                                        learn_curve['loss']))
+        for _key, _value in self._learn_curve_parameter.items():
+            _value.points.append((self._dashboard_screen.hover_graph.current_epoch, learn_curve[_key]))
+
+        if self._using_validation:
+            self._info_dict["max_val_acc"] = learn_curve["val_accuracy"] if self._info_dict["max_val_acc"] < learn_curve["val_accuracy"] else \
+                self._info_dict["max_val_acc"]
+            self._info_dict["min_val_loss"] = learn_curve["val_loss"] if self._info_dict["min_val_loss"] > learn_curve["val_loss"] else \
+                self._info_dict["min_val_loss"]
+            self._dashboard_screen.ids.max_val_acc.text = str(round(self._info_dict["max_val_acc"], 4))
+            self._dashboard_screen.ids.min_val_loss.text = str(round(self._info_dict["min_val_loss"], 4))
+
+        self._info_dict["max_acc"] = learn_curve["accuracy"] if self._info_dict["max_acc"] < learn_curve["accuracy"] else self._info_dict["max_acc"]
+        self._info_dict["min_loss"] = learn_curve["loss"] if self._info_dict["min_loss"] > learn_curve["loss"] else self._info_dict["min_loss"]
+
+        self._dashboard_screen.ids.max_acc.text = str(round(self._info_dict["max_acc"], 4))
+        self._dashboard_screen.ids.min_loss.text = str(round(self._info_dict["min_loss"], 4))
+
+        if self._dashboard_screen.hover_graph.current_epoch >= 2:
+            self.ETA_time = timedelta(
+                seconds=time_freq.total_seconds() * (self._dashboard_screen.hover_graph.epoch - self._dashboard_screen.hover_graph.current_epoch))
+            hours, remainder = divmod(self.ETA_time.seconds, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            if self.ETA_time.days:
+                self._dashboard_screen.ids.remain_time.text = "{}Days".format(self.ETA_time.days)
+            else:
+                self._dashboard_screen.ids.remain_time.text = '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
+
+        value = self._dashboard_screen.hover_graph.current_epoch / self._dashboard_screen.hover_graph.epoch * 100
+        self._dashboard_screen.ids.progress_bar.value = value
+        self._dashboard_screen.ids.progress_value.text = "[b]{}[/b]%".format(round(value, 2))
+        self._dashboard_screen.ids.progress_epochs.text = "{} / {} Epochs".format(self._dashboard_screen.hover_graph.current_epoch,
+                                                                                  self._dashboard_screen.hover_graph.epoch)
+
+        if self._dashboard_screen.hover_graph.current_epoch == self._dashboard_screen.hover_graph.epoch:
+            self.finish_flag = True
+            self._dashboard_screen.ids.remain_time.text = "Finish"
+
+    def export_file(self, args):
+        pass
+
+    def discard_data(self, args):
+        pass
+
+    def set_epochs(self, args):
+        pass
+
+    def estimated_time_arrival_clock(self, args):
+        if not self.finish_flag and (self._dashboard_screen.hover_graph.current_epoch >= 2):
+            self.ETA_time = self.ETA_time - timedelta(seconds=1)
+            hours, remainder = divmod(self.ETA_time.total_seconds(), 3600)
+            minutes, seconds = divmod(remainder, 60)
+            if self.ETA_time.days:
+                self._dashboard_screen.ids.remain_time.text = "{}Days".format(self.ETA_time.days)
+            else:
+                self._dashboard_screen.ids.remain_time.text = '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
+
+    def build(self):
+        Window.size = (1200, 650)
+        self.icon = 'asset/images/logo_64.png'
+        self._connection_damon_thread.start()
+        self._scree_manager.current = 'connect'
+        Clock.schedule_interval(self.estimated_time_arrival_clock, 1)
+        return self._scree_manager
 
 
 if __name__ == '__main__':

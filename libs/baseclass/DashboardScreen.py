@@ -51,10 +51,11 @@ class HoverGraph(FloatLayout, ThemableBehavior, HoverBehavior):
         self.half_graph_padding = self.graph.padding / 2
         self.ids.tooltips.opacity = 0
 
-        self._using_validation = True
-        self.plot_dict = {0: self.accuracy_plot, 1: self.loss_plot, 2: self.val_accuracy_plot, 3: self.val_loss_plot}
+        self.plot_dict = {0: [self.accuracy_plot, '[color=3B689B]●[/color] Acc: ', self.ids.accuracy_tip],
+                          1: [self.loss_plot, '[color=fc444f]●[/color] Loss: ', self.ids.loss_tip],
+                          2: [self.val_accuracy_plot, '[color=16A364]●[/color] ValAcc: ', self.ids.val_accuracy_tip],
+                          3: [self.val_loss_plot, '[color=f5aa31]●[/color] ValLoss: ', self.ids.val_loss_tip]}
 
-        # TODO check the size
         self.offset_x = 10
         self.offset_y = 10
 
@@ -73,23 +74,16 @@ class HoverGraph(FloatLayout, ThemableBehavior, HoverBehavior):
                 if idx <= self.current_epoch:
                     if self.touch_flag:
                         for value in self.plot_dict.values():
-                            y_len = ((value.points[idx][1] * self.graph.view_size[1]) / self.graph.ymax) + graph_y_start
+                            y_len = ((value[0].points[idx][1] * self.graph.view_size[1]) / self.graph.ymax) + graph_y_start
                             x_len = (step * idx) + graph_x_start
-                            if self.graph.ymin <= value.points[idx][1] <= self.graph.ymax:
+                            if self.graph.ymin <= value[0].points[idx][1] <= self.graph.ymax:
                                 Color(.15, .15, .15, .8)
                                 Line(circle=(x_len, y_len, 3), width=1.5)
+                            value[2].text = value[1] + str(round(value[0].points[idx][1], 6))
                         if idx < self.epoch * .85:
                             self.ids.tooltips.pos = (mouse_pos[0] + 15, mouse_pos[1] - 55)
                         else:
                             self.ids.tooltips.pos = (mouse_pos[0] - self.ids.tooltips.width - 15, mouse_pos[1] - 55)
-
-                        self.ids.accuracy_tip.text = '[color=3B689B]●[/color] Acc: ' + str(round(self.accuracy_plot.points[idx][1], 6))
-                        self.ids.loss_tip.text = '[color=fc444f]●[/color] Loss: ' + str(round(self.loss_plot.points[idx][1], 6))
-
-                        if self._using_validation:
-                            self.ids.val_accuracy_tip.text = '[color=16A364]●[/color] ValAcc: ' + str(round(self.val_accuracy_plot.points[idx][1], 6))
-                            self.ids.val_loss_tip.text = '[color=f5aa31]●[/color] ValLoss: ' + str(round(self.val_loss_plot.points[idx][1], 6))
-
                         self.ids.idx_legend_label.text = 'Index: ' + str(idx)
                         self.ids.tooltips.opacity = 1
                         self.ids.idx_legend.opacity = 1
@@ -134,14 +128,19 @@ class HoverGraph(FloatLayout, ThemableBehavior, HoverBehavior):
         self.enter_flag = False
 
     def not_validation(self):
-        self._using_validation = False
-        self.plot_dict = {0: self.accuracy_plot, 1: self.loss_plot}
+        self.plot_dict.clear()
+        self.plot_dict = {0: [self.accuracy_plot, '[color=3B689B]●[/color] Acc: ', self.ids.accuracy_tip],
+                          1: [self.loss_plot, '[color=fc444f]●[/color] Loss: ', self.ids.loss_tip]}
+
         self.ids.legend_val_acc.text_color = utils.get_color_from_hex('#CCCCCCCC')
         self.ids.legend_val_loss.text_color = utils.get_color_from_hex('#CCCCCCCC')
+
         self.ids.legend_val_acc.text = "[color=16A364]✖[/color] Val Accuracy"
         self.ids.legend_val_loss.text = "[color=f5aa31]✖[/color] Val Loss"
+
         self.ids.tooltips.remove_widget(self.ids.val_accuracy_tip)
         self.ids.tooltips.remove_widget(self.ids.val_loss_tip)
+
         self.ids.tooltips.height = self.ids.tooltips.height / 2
 
 
@@ -157,7 +156,6 @@ if __name__ == '__main__':
             self.sm.add_widget(self.dashboard_screen)
 
         def build(self):
-            self.icon = '../../asset/images/logo_128.png'
             return self.sm
 
 

@@ -19,7 +19,7 @@
                 font_name: "asset/fonts/KOTRA_BOLD.ttf"
                 font_size: 60
                 theme_text_color: "Custom"
-                text_color: utils.get_color_from_hex('#FFFFFFFF')
+                text_color: utils.get_color_from_hex('#80808080')
                 halign: "center"
                 pos_hint: {'center_x': .5, 'center_y': .5}
         MDFloatLayout:
@@ -29,11 +29,12 @@
             size: 400, 450
             canvas.before:
                 Color:
-                    rgba: utils.get_color_from_hex('#FFFFFF80')
+                    rgba: utils.get_color_from_hex('#FFFFFFFF')
                 RoundedRectangle:
                     pos: self.pos
                     size: self.size
                     radius: [25, 25, 25, 25]
+
             MDFloatLayout:
                 id: option_text_field_1
                 pos_hint: {"center_x":.5, "center_y":.5}
@@ -135,7 +136,7 @@
                     size_hint_x: .2
                     line_color_focus: utils.get_color_from_hex('#158585FF')
         MDFloatLayout:
-            pos_hint: {'right': .92, 'y': .01}
+            pos: root.width-200, 20
             size_hint: None , None
             size: 90, 35
             MDTextButton:
@@ -157,7 +158,7 @@
                 size_hint: 1, 1
                 pos_hint: {'center_x':.225 , 'center_y': .5 }
         MDFloatLayout:
-            pos_hint: {'right': .99, 'y': .01}
+            pos: root.width-110, 20
             size_hint: None , None
             size: 90, 35
             MDTextButton:

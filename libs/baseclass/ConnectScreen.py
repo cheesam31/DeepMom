@@ -2,6 +2,8 @@ from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton, MDFillRoundFlatButton
 from kivy.animation import Animation
 from kivy.uix.screenmanager import Screen
+from kivymd.uix.behaviors import RoundedRectangularElevationBehavior
+from kivymd.uix.boxlayout import MDBoxLayout
 from kivy.clock import Clock
 from kivy import utils
 from threading import Thread
@@ -10,6 +12,10 @@ from time import sleep
 from .DeepMomRequestResponse import DeepMomResponseState as DMRes_state
 from .DeepMomRequestResponse import DeepMomRequest as DMReq
 from .DeepMomRequestResponse import DeepMomRequestState as DMReq_state
+
+
+class BaseShadowWidget(RoundedRectangularElevationBehavior, MDBoxLayout):
+    pass
 
 
 class ConnectScreen(Screen):
@@ -142,6 +148,7 @@ class ConnectScreen(Screen):
                     _btn = MDFillRoundFlatButton(text="Subscribe", font_size=16, pos_hint={"center_x": .5, "center_y": .15}, size_hint_x=.4,
                                                  theme_background_color="Custom", md_bg_color=utils.get_color_from_hex('#1EB9B9FF'),
                                                  on_release=self.subscribe_press)
+
                     self.ids.base_Float.add_widget(_btn)
                     animate = Animation(size=(630, 270), duration=.3)
                     animate.start(self.ids.mqtt_topic_wrapper)
