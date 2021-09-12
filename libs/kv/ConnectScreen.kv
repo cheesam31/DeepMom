@@ -3,7 +3,7 @@
 
 <ConnectScreen>
     Screen:
-        name: "connect"
+        name: 'connect'
         canvas.before:
             Color:
                 rgba: utils.get_color_from_hex('#C2E2C380')
@@ -11,20 +11,20 @@
                 pos: self.pos
                 size: self.size
         MDFloatLayout:
-            pos_hint: {"x":.01, "y":.01}
+            pos_hint: {'x':.01, 'y':.01}
             size_hint: None , None
             size: 350, 100
             MDLabel:
-                text: "DeepMom"
-                font_name: "asset/fonts/KOTRA_BOLD.ttf"
+                text: 'DeepMom'
+                font_name: 'asset/fonts/KOTRA_BOLD.ttf'
                 font_size: 60
-                theme_text_color: "Custom"
+                theme_text_color: 'Custom'
                 text_color: utils.get_color_from_hex('#80808080')
-                halign: "center"
+                halign: 'center'
                 pos_hint: {'center_x': .5, 'center_y': .5}
         MDFloatLayout:
             id: base_Float
-            pos_hint: {"center_x":.5, "center_y":.5}
+            pos_hint: {'center_x':.5, 'center_y':.5}
             size_hint: None , None
             size: 400, 450
             canvas.before:
@@ -37,62 +37,62 @@
 
             MDFloatLayout:
                 id: option_text_field_1
-                pos_hint: {"center_x":.5, "center_y":.5}
+                pos_hint: {'center_x':.5, 'center_y':.5}
                 size_hint: None , None
                 size: 400, 450
                 MDTextField:
                     id: user_id
-                    hint_text: "Enter your ID"
-                    pos_hint: {"center_x":.5, "center_y":.65}
+                    hint_text: 'Enter your ID'
+                    pos_hint: {'center_x':.5, 'center_y':.65}
                     size_hint_x: .6
                     disabled: False
                     line_color_focus: utils.get_color_from_hex('#158585FF')
                 MDTextField:
                     id: user_passwd
-                    hint_text: "Enter your passwd"
-                    pos_hint: {"center_x":.5, "center_y":.525}
+                    hint_text: 'Enter your passwd'
+                    pos_hint: {'center_x':.5, 'center_y':.525}
                     size_hint_x: .6
                     disabled: False
                     password: True
                     line_color_focus: utils.get_color_from_hex('#158585FF')
             MDFloatLayout:
                 id: option_text_field_2
-                pos_hint: {"center_x":.5, "center_y":.5}
+                pos_hint: {'center_x':.5, 'center_y':.5}
                 size_hint: None , None
                 size: 400, 450
                 MDTextField:
                     id: broker_ip
-                    hint_text: "Broker IP"
-                    pos_hint: {"x":.2, "center_y":.4}
+                    hint_text: 'Broker IP'
+                    pos_hint: {'x':.2, 'center_y':.4}
                     size_hint_x: .4
                     line_color_focus: utils.get_color_from_hex('#158585FF')
                 MDTextField:
                     id: broker_port
-                    hint_text: "Port"
-                    pos_hint: {"right":.8, "center_y":.4}
+                    hint_text: 'Port'
+                    pos_hint: {'right':.8, 'center_y':.4}
                     size_hint_x: .15
                     line_color_focus: utils.get_color_from_hex('#158585FF')
                 MDFillRoundFlatButton:
                     id: connect_button
-                    text:"Connect"
+                    text:'Connect'
                     font_size: 16
-                    pos_hint: {"center_x":.5, "center_y":.15}
+                    pos_hint: {'center_x':.5, 'center_y':.15}
                     size_hint_x: .4
                     on_release: root.connect_press()
-                    theme_background_color: "Custom"
+                    theme_background_color: 'Custom'
                     md_bg_color: utils.get_color_from_hex('#1EB9B9FF')
                 MDLabel:
                     id: explain_label
-                    text: "using user account"
+                    text: 'using user account'
                     font_size: 14
-                    theme_text_color: "Custom"
+                    theme_text_color: 'Custom'
                     text_color: 133, 133, 133, 1
-                    halign: "center"
+                    halign: 'center'
                     pos_hint: {'center_x': .5, 'center_y': .275}
                 MDCheckbox:
                     id: using_account_check_box
                     size_hint: None, None
-                    size: "48dp", "48dp"
+                    size: '48dp', '48dp'
                     pos_hint: {'x': .25, 'center_y': .275}
                     active: True
                     on_release:
@@ -102,19 +102,19 @@
                 id: spinner
                 active: False
                 size_hint: None, None
-                size: "48dp", "48dp"
+                size: '48dp', '48dp'
                 color: utils.get_color_from_hex('#1EB9B9FF')
                 pos_hint: {'center_x': .5, 'center_y': .5}
             MDFloatLayout:
-                pos_hint: {"center_x":.5, "top":1}
+                pos_hint: {'center_x':.5, 'top':1}
                 size_hint: None , None
                 size: 128, 128
                 Image:
-                    source: "asset/images/logo_128.png"
-                    pos_hint: {"center_x":.5, "center_y": .5}
+                    source: 'asset/images/logo_128.png'
+                    pos_hint: {'center_x':.5, 'center_y': .5}
             MDFloatLayout:
                 id: mqtt_topic_wrapper
-                pos_hint: {"center_x":.5, "center_y":.5}
+                pos_hint: {'center_x':.5, 'center_y':.5}
                 size_hint: None , None
                 size: 0, 0
                 canvas.before:
@@ -125,14 +125,14 @@
                         size: self.size
                 MDTextField:
                     id: mqtt_topic
-                    hint_text: ""
-                    pos_hint: {"x":.05, "center_y":.425}
+                    hint_text: ''
+                    pos_hint: {'x':.05, 'center_y':.425}
                     size_hint_x: .65
                     line_color_focus: utils.get_color_from_hex('#158585FF')
                 MDTextField:
                     id: epoch
-                    hint_text: ""
-                    pos_hint: {"right":.95, "center_y":.425}
+                    hint_text: ''
+                    pos_hint: {'right':.95, 'center_y':.425}
                     size_hint_x: .2
                     line_color_focus: utils.get_color_from_hex('#158585FF')
         MDFloatLayout:
@@ -140,10 +140,10 @@
             size_hint: None , None
             size: 90, 35
             MDTextButton:
-                halign: "left"
-                theme_text_color: "Custom"
+                halign: 'left'
+                theme_text_color: 'Custom'
                 text_color: 0, 0, 0, .5
-                text: "github"
+                text: 'github'
                 custom_color: 0, 1, 0, 1
                 size_hint: .75, .75
                 pos_hint: {'center_x': .75, 'center_y': .5 }
@@ -151,10 +151,10 @@
                     import webbrowser
                     webbrowser.open('https://github.com/cheesam31')
             MDIcon:
-                halign: "center"
-                theme_text_color: "Custom"
+                halign: 'center'
+                theme_text_color: 'Custom'
                 text_color: 0, 0, 0, .5
-                icon: "github"
+                icon: 'github'
                 size_hint: 1, 1
                 pos_hint: {'center_x':.225 , 'center_y': .5 }
         MDFloatLayout:
@@ -162,10 +162,10 @@
             size_hint: None , None
             size: 90, 35
             MDTextButton:
-                halign: "left"
-                theme_text_color: "Custom"
+                halign: 'left'
+                theme_text_color: 'Custom'
                 text_color: 0, 0, 0, .5
-                text: "blog"
+                text: 'blog'
                 custom_color: 0, 1, 0, 1
                 size_hint: .75, .75
                 pos_hint: {'center_x': .75, 'center_y': .5 }
@@ -173,9 +173,9 @@
                     import webbrowser
                     webbrowser.open('https://velog.io/@cheesam31')
             MDIcon:
-                halign: "center"
-                theme_text_color: "Custom"
+                halign: 'center'
+                theme_text_color: 'Custom'
                 text_color: 0, 0, 0, .5
-                icon: "notebook-outline"
+                icon: 'notebook-outline'
                 size_hint: 1, 1
                 pos_hint: {'center_x':.225 , 'center_y': .5 }

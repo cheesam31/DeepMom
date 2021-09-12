@@ -14,11 +14,11 @@
                 size: root.width - 20, root.height - 20
         BoxLayout:
             id: graph_plot
-            pos_hint: {"center_x":.5, "center_y":.5}
+            pos_hint: {'center_x':.5, 'center_y':.5}
             size_hint: 1 , 1
         BoxLayout:
             id: hover_plot
-            pos_hint: {"center_x":.5, "center_y":.5}
+            pos_hint: {'center_x':.5, 'center_y':.5}
             size_hint: 1 , 1
         BoxLayout:
             id: tooltips
@@ -35,28 +35,28 @@
             MDLabel:
                 id: accuracy_tip
                 pos_hint:{'x': .05, 'center_y': .5}
-                theme_text_color: "Custom"
+                theme_text_color: 'Custom'
                 text_color: 1,1,1,1
                 font_name: 'asset/fonts/tway_air.ttf'
                 markup: True
             MDLabel:
                 id: val_accuracy_tip
                 pos_hint:{'x': .05, 'center_y': .5}
-                theme_text_color: "Custom"
+                theme_text_color: 'Custom'
                 text_color: 1,1,1,1
                 font_name: 'asset/fonts/tway_air.ttf'
                 markup: True
             MDLabel:
                 id: loss_tip
                 pos_hint:{'x': .05, 'center_y': .5}
-                theme_text_color: "Custom"
+                theme_text_color: 'Custom'
                 text_color: 1,1,1,1
                 font_name: 'asset/fonts/tway_air.ttf'
                 markup: True
             MDLabel:
                 id: val_loss_tip
                 pos_hint:{'x': .05, 'center_y': .5}
-                theme_text_color: "Custom"
+                theme_text_color: 'Custom'
                 text_color: 1,1,1,1
                 font_name: 'asset/fonts/tway_air.ttf'
                 markup: True
@@ -76,7 +76,7 @@
                 size: 120, 40
                 pos: idx_legend.x + 10, idx_legend.y
                 #pos_hint:{'center_x': .5, 'center_y': .5}
-                theme_text_color: "Custom"
+                theme_text_color: 'Custom'
                 text_color: 1,1,1,1
                 font_name: 'asset/fonts/tway_air.ttf'
                 markup: True
@@ -94,36 +94,36 @@
                     size: self.size
             MDLabel:
                 id: legend_acc
-                text: "[color=3B689B]●[/color] Accuracy"
+                text: '[color=3B689B]●[/color] Accuracy'
                 pos_hint:{'x': .05, 'center_y': .5}
-                theme_text_color: "Custom"
+                theme_text_color: 'Custom'
                 text_color: 1,1,1,1
                 font_name: 'asset/fonts/tway_air.ttf'
                 font_size: 14
                 markup: True
             MDLabel:
                 id: legend_val_acc
-                text: "[color=16A364]●[/color] Val Accuracy"
+                text: '[color=16A364]●[/color] Val Accuracy'
                 pos_hint:{'x': .05, 'center_y': .5}
-                theme_text_color: "Custom"
+                theme_text_color: 'Custom'
                 text_color: 1,1,1,1
                 font_name: 'asset/fonts/tway_air.ttf'
                 font_size: 14
                 markup: True
             MDLabel:
                 id: legend_loss
-                text: "[color=fc444f]●[/color] Loss"
+                text: '[color=fc444f]●[/color] Loss'
                 pos_hint:{'x': .05, 'center_y': .5}
-                theme_text_color: "Custom"
+                theme_text_color: 'Custom'
                 text_color: 1,1,1,1
                 font_name: 'asset/fonts/tway_air.ttf'
                 font_size:14
                 markup: True
             MDLabel:
                 id: legend_val_loss
-                text: "[color=f5aa31]●[/color] Val Loss"
+                text: '[color=f5aa31]●[/color] Val Loss'
                 pos_hint:{'x': .05, 'center_y': .5}
-                theme_text_color: "Custom"
+                theme_text_color: 'Custom'
                 text_color: 1,1,1,1
                 font_name: 'asset/fonts/tway_air.ttf'
                 font_size: 14
@@ -132,10 +132,10 @@
 <DashboardScreen>
     MDToolbar:
         id: toolbar
-        pos_hint: {"top": 1}
+        pos_hint: {'top': 1}
         elevation: 10
-        title: "DeepMom"
-        right_action_items: [["file-export-outline", app.export_file],["trash-can-outline", app.discard_data],["cog", app.set_epochs]]
+        title: 'DeepMom'
+        right_action_items: [['file-export-outline', app.export_file],['trash-can-outline', app.discard_data],['cog', app.set_epochs]]
         md_bg_color: utils.get_color_from_hex('#C2E2C380')
     FloatLayout:
         id: base_canvas
@@ -150,7 +150,7 @@
                 size: self.size
         FloatLayout:
             id: info_canvas_base
-            pos_hint: {"x": 0, "top":1}
+            pos_hint: {'x': 0, 'top':1}
             size_hint: 1, .25
             MDFloatLayout:
                 id: info_canvas
@@ -170,16 +170,16 @@
                             size: self.size
                             radius: [(10.0, 10.0), (10.0, 10.0), (0.0, 0.0), (0.0, 0.0)]
                     MDLabel:
-                        text: "Max Acc"
-                        theme_text_color: "Custom"
+                        text: 'Max Acc'
+                        theme_text_color: 'Custom'
                         text_color: 1,1,1,1
-                        font_name: "asset/fonts/tway_air.ttf"
+                        font_name: 'asset/fonts/tway_air.ttf'
                         font_size: (self.height * 0.25 + self.width * 0.25)/2.5
-                        halign: "center"
-                        pos_hint: {"center_x": .5, "center_y": .5}
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
                 FloatLayout:
                     id: accuracy_info
-                    pos_hint: {"x": 0, "y": 0}
+                    pos_hint: {'x': 0, 'y': 0}
                     size_hint: None, None
                     size: (info_canvas.width-50)/6, (info_canvas.height/4)*3
                     canvas.before:
@@ -191,10 +191,10 @@
                             radius: [(0.0, 0.0), (0.0, 0.0), (10.0, 10.0), (10.0, 10.0)]
                     MDLabel:
                         id: max_acc
-                        text: "Unknown"
+                        text: 'Unknown'
                         font_size: (self.height * 0.25 + self.width * 0.25)/2
-                        halign: "center"
-                        pos_hint: {"center_x": .5, "center_y": .5}
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
                 FloatLayout:
                     id: val_accuracy_info_header
                     size_hint: None, None
@@ -208,13 +208,13 @@
                             size: self.size
                             radius: [(10.0, 10.0), (10.0, 10.0), (0.0, 0.0), (0.0, 0.0)]
                     MDLabel:
-                        text: "Max valAcc"
-                        theme_text_color: "Custom"
+                        text: 'Max valAcc'
+                        theme_text_color: 'Custom'
                         text_color: 1,1,1,1
-                        font_name: "asset/fonts/tway_air.ttf"
+                        font_name: 'asset/fonts/tway_air.ttf'
                         font_size: (self.height * 0.25 + self.width * 0.25)/2.5
-                        halign: "center"
-                        pos_hint: {"center_x": .5, "center_y": .5}
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
                 FloatLayout:
                     id: val_accuracy_info
                     pos: accuracy_info.x + accuracy_info.width + 10, info_canvas.y
@@ -229,10 +229,10 @@
                             radius: [(0.0, 0.0), (0.0, 0.0), (10.0, 10.0), (10.0, 10.0)]
                     MDLabel:
                         id: max_val_acc
-                        text: "Unknown"
+                        text: 'Unknown'
                         font_size: (self.height * 0.25 + self.width * 0.25)/2
-                        halign: "center"
-                        pos_hint: {"center_x": .5, "center_y": .5}
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
                 FloatLayout:
                     id: loss_info_header
                     size_hint: None, None
@@ -246,13 +246,13 @@
                             size: self.size
                             radius: [(10.0, 10.0), (10.0, 10.0), (0.0, 0.0), (0.0, 0.0)]
                     MDLabel:
-                        text: "Min Loss"
-                        theme_text_color: "Custom"
+                        text: 'Min Loss'
+                        theme_text_color: 'Custom'
                         text_color: 1,1,1,1
-                        font_name: "asset/fonts/tway_air.ttf"
+                        font_name: 'asset/fonts/tway_air.ttf'
                         font_size: (self.height * 0.25 + self.width * 0.25)/2.5
-                        halign: "center"
-                        pos_hint: {"center_x": .5, "center_y": .5}
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
                 FloatLayout:
                     id: loss_info
                     size_hint: None, None
@@ -267,10 +267,10 @@
                             radius: [(0.0, 0.0), (0.0, 0.0), (10.0, 10.0), (10.0, 10.0)]
                     MDLabel:
                         id: min_loss
-                        text: "Unknown"
+                        text: 'Unknown'
                         font_size: (self.height * 0.25 + self.width * 0.25)/2
-                        halign: "center"
-                        pos_hint: {"center_x": .5, "center_y": .5}
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
                 FloatLayout:
                     id: val_loss_info_header
                     size_hint: None, None
@@ -284,13 +284,13 @@
                             size: self.size
                             radius: [(10.0, 10.0), (10.0, 10.0), (0.0, 0.0), (0.0, 0.0)]
                     MDLabel:
-                        text: "Min valLoss"
-                        theme_text_color: "Custom"
+                        text: 'Min valLoss'
+                        theme_text_color: 'Custom'
                         text_color: 1,1,1,1
-                        font_name: "asset/fonts/tway_air.ttf"
+                        font_name: 'asset/fonts/tway_air.ttf'
                         font_size: (self.height * 0.25 + self.width * 0.25)/2.5
-                        halign: "center"
-                        pos_hint: {"center_x": .5, "center_y": .5}
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
                 FloatLayout:
                     id: val_loss_info
                     size_hint: None, None
@@ -305,10 +305,10 @@
                             radius: [(0.0, 0.0), (0.0, 0.0), (10.0, 10.0), (10.0, 10.0)]
                     MDLabel:
                         id: min_val_loss
-                        text: "Unknown"
+                        text: 'Unknown'
                         font_size: (self.height * 0.25 + self.width * 0.25)/2
-                        halign: "center"
-                        pos_hint: {"center_x": .5, "center_y": .5}
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
                 FloatLayout:
                     id: ETA
                     pos: val_loss_info.x + val_loss_info.width + 10, info_canvas.y
@@ -322,16 +322,16 @@
                             size: self.size
                             radius: [(10.0, 10.0), (10.0, 10.0), (10.0, 10.0), (10.0, 10.0)]
                     MDLabel:
-                        text: "ETA"
-                        halign: "center"
-                        pos_hint: {"center_x": .5, "center_y": .65}
+                        text: 'ETA'
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .65}
                         font_size: (self.height * 0.25 + self.width * 0.25)/1.5
                         font_name: 'asset/fonts/KOTRA_BOLD.ttf'
                     MDLabel:
                         id: remain_time
-                        text: "Unknown"
-                        halign: "center"
-                        pos_hint: {"center_x": .5, "center_y": .25}
+                        text: 'Unknown'
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .25}
                         font_size: (self.height * 0.25 + self.width * 0.25)/2.5
                         font_name: 'asset/fonts/PretendardVariable.ttf'
                     FloatLayout:
@@ -349,25 +349,25 @@
                             id: progress_bar
                             size_hint: None, None
                             size: progress.width*.8, progress.height*.2
-                            pos_hint: {"center_x": .5, "center_y": .3}
+                            pos_hint: {'center_x': .5, 'center_y': .3}
                             value: 0
                             color: utils.get_color_from_hex('#A465D4')
                         MDLabel:
                             id: progress_value
-                            text: "Unknown"
+                            text: 'Unknown'
                             font_size: (self.height * 0.25 + self.width * 0.25)/2
-                            halign: "center"
-                            pos_hint: {"center_x": .5, "center_y": .6}
+                            halign: 'center'
+                            pos_hint: {'center_x': .5, 'center_y': .6}
                             markup: True
                         MDLabel:
                             id: progress_epochs
-                            text: "Unknown"
+                            text: 'Unknown'
                             font_size: (self.height * 0.25 + self.width * 0.25)/8
-                            halign: "center"
-                            pos_hint: {"center_x": .5, "center_y": .15}
+                            halign: 'center'
+                            pos_hint: {'center_x': .5, 'center_y': .15}
         FloatLayout:
             id: hover_graph_canvas
-            pos_hint: {"x": 0, "y":0}
+            pos_hint: {'x': 0, 'y':0}
             size_hint: 1, .75
             canvas.before:
                 Color:
@@ -376,13 +376,14 @@
                     pos: self.pos
                     size: self.size
 
-
-<Content>
-    orientation: "vertical"
-    spacing: "12dp"
+<EpochSetting>
+    orientation: 'vertical'
+    spacing: '12dp'
     size_hint_y: None
-    height: "120dp"
+    height: '120dp'
 
     MDTextField:
-        id: test
-        hint_text: "City"
+        id: epochs_text
+        hint_text: 'Epochs'
+        line_color_focus: utils.get_color_from_hex('#158585FF')
+        input_type: 'number'

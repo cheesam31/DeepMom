@@ -6,7 +6,8 @@ from kivymd.uix.behaviors import HoverBehavior
 from kivymd.theming import ThemableBehavior
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy import utils
-from kivy_garden.graph import Graph, SmoothLinePlot
+from kivy_garden.graph import Graph, LinePlot
+from kivy.uix.boxlayout import BoxLayout
 
 
 class DashboardScreen(Screen):
@@ -14,7 +15,7 @@ class DashboardScreen(Screen):
         super(DashboardScreen, self).__init__(**kwargs)
         self.hover_graph = HoverGraph()
         self.ids.hover_graph_canvas.add_widget(self.hover_graph)
-        self.ids.toolbar.ids.label_title.font_name = "asset/fonts/KOTRA_BOLD.ttf"
+        self.ids.toolbar.ids.label_title.font_name = 'asset/fonts/KOTRA_BOLD.ttf'
         self.ids.toolbar.ids.label_title.font_size = 26
         self.ids.toolbar.ids.label_title.pos_hint = {'center_x': .5, 'center_y': .5}
 
@@ -30,13 +31,13 @@ class HoverGraph(FloatLayout, ThemableBehavior, HoverBehavior):
 
         self.graph = Graph(x_ticks_minor=5, x_ticks_major=self.epoch / 10, y_ticks_major=1.5 / 6, y_grid_label=True, x_grid_label=True,
                            border_color=(0, 0, 0, 0), tick_color=(0, 0, 0, .5), font_size=12, padding=10,
-                           label_options={"color": utils.get_color_from_hex("#000000FF"), "font_name": "asset/fonts/PretendardVariable.ttf"},
+                           label_options={'color': utils.get_color_from_hex('#000000FF'), 'font_name': 'asset/fonts/PretendardVariable.ttf'},
                            x_grid=False, y_grid=True, xmin=0, xmax=self.epoch, ymin=0, ymax=1.5, draw_border=False)
 
-        self.accuracy_plot = SmoothLinePlot(color=utils.get_color_from_hex('#3B689BCC'))
-        self.val_accuracy_plot = SmoothLinePlot(color=utils.get_color_from_hex('#16A364CC'))
-        self.loss_plot = SmoothLinePlot(color=utils.get_color_from_hex('##FC444FCC'))
-        self.val_loss_plot = SmoothLinePlot(color=utils.get_color_from_hex('#F5AA31CC'))
+        self.accuracy_plot = LinePlot(color=utils.get_color_from_hex('#3B689BCC'), line_width=1.2)
+        self.val_accuracy_plot = LinePlot(color=utils.get_color_from_hex('#16A364CC'), line_width=1.2)
+        self.loss_plot = LinePlot(color=utils.get_color_from_hex('##FC444FCC'), line_width=1.2)
+        self.val_loss_plot = LinePlot(color=utils.get_color_from_hex('#F5AA31CC'), line_width=1.2)
         self.accuracy_plot.points = [(0, 0)]
         self.val_accuracy_plot.points = [(0, 0)]
         self.loss_plot.points = [(0, 0)]
@@ -135,13 +136,35 @@ class HoverGraph(FloatLayout, ThemableBehavior, HoverBehavior):
         self.ids.legend_val_acc.text_color = utils.get_color_from_hex('#CCCCCCCC')
         self.ids.legend_val_loss.text_color = utils.get_color_from_hex('#CCCCCCCC')
 
-        self.ids.legend_val_acc.text = "[color=16A364]✖[/color] Val Accuracy"
-        self.ids.legend_val_loss.text = "[color=f5aa31]✖[/color] Val Loss"
+        self.ids.legend_val_acc.text = '[color=16A364]✖[/color] Val Accuracy'
+        self.ids.legend_val_loss.text = '[color=f5aa31]✖[/color] Val Loss'
 
         self.ids.tooltips.remove_widget(self.ids.val_accuracy_tip)
         self.ids.tooltips.remove_widget(self.ids.val_loss_tip)
 
         self.ids.tooltips.height = self.ids.tooltips.height / 2
+
+    def reset(self):
+        self.plot_dict.clear()
+        self.plot_dict = {0: [self.accuracy_plot, '[color=3B689B]●[/color] Acc: ', self.ids.accuracy_tip],
+                          1: [self.loss_plot, '[color=fc444f]●[/color] Loss: ', self.ids.loss_tip],
+                          2: [self.val_accuracy_plot, '[color=16A364]●[/color] ValAcc: ', self.ids.val_accuracy_tip],
+                          3: [self.val_loss_plot, '[color=f5aa31]●[/color] ValLoss: ', self.ids.val_loss_tip]}
+
+        self.ids.legend_val_acc.text_color = utils.get_color_from_hex('#FFFFFFFF')
+        self.ids.legend_val_loss.text_color = utils.get_color_from_hex('#FFFFFFFF')
+
+        self.ids.legend_val_acc.text = '[color=16A364]●[/color] Val Accuracy'
+        self.ids.legend_val_loss.text = '[color=f5aa31]●[/color] Val Loss'
+
+        self.ids.tooltips.add_widget(self.ids.val_accuracy_tip)
+        self.ids.tooltips.add_widget(self.ids.val_loss_tip)
+
+        self.ids.tooltips.height = self.ids.tooltips.height * 2
+
+
+class EpochSetting(BoxLayout):
+    pass
 
 
 if __name__ == '__main__':
