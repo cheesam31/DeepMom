@@ -1,91 +1,54 @@
 #:import utils kivy.utils
 #:import os os
+#:import window kivy.core.window.Window
 
 <HoverGraph>
-    FloatLayout
-        pos: 10, 10
+    FloatLayout:
+        pos: root.pos
         size_hint: None, None
-        size: root.width - 20, root.height - 35
+        size: root.width, root.height
         canvas.before:
             Color:
-                rgba: utils.get_color_from_hex('#FFFFFFFF')
+                rgba: utils.get_color_from_hex('#26283A')
             RoundedRectangle:
                 pos: self.pos
-                size: root.width - 20, root.height - 20
+                size: self.size
+                radius: [5, 5, 5, 5]
         BoxLayout:
             id: graph_plot
+            text: 'graph_plot'
             pos_hint: {'center_x':.5, 'center_y':.5}
-            size_hint: 1 , 1
+            size_hint: 1, 1
+            Graph:
+                id: graph
+                tick_color: utils.get_color_from_hex('#FFFFFFB3')
+                border_color: utils.get_color_from_hex('FFFFFF80')
+                font_size: 12
+                draw_border: False
+                xmin: 0
+                xmax: 500
+                ymin: 0
+                ymax: 1
+                x_ticks_minor: 5
+                x_ticks_major: graph.xmax / 10
+                y_ticks_major: graph.ymax / 5
+                x_grid:False
+                y_grid:True
+                x_grid_label: True
+                y_grid_label: True 
+                padding: 15
+
+                padding: 10
         BoxLayout:
             id: hover_plot
             pos_hint: {'center_x':.5, 'center_y':.5}
-            size_hint: 1 , 1
-        BoxLayout:
-            id: tooltips
-            orientation: 'vertical'
-            size_hint: None, None
-            pos: 100, 100
-            size: 170, 100
-            canvas.before:
-                Color:
-                    rgba: utils.get_color_from_hex('#000000CC')
-                RoundedRectangle:
-                    pos: self.pos
-                    size: self.size
-            MDLabel:
-                id: accuracy_tip
-                pos_hint:{'x': .05, 'center_y': .5}
-                theme_text_color: 'Custom'
-                text_color: 1,1,1,1
-                font_name: 'asset/fonts/tway_air.ttf'
-                markup: True
-            MDLabel:
-                id: val_accuracy_tip
-                pos_hint:{'x': .05, 'center_y': .5}
-                theme_text_color: 'Custom'
-                text_color: 1,1,1,1
-                font_name: 'asset/fonts/tway_air.ttf'
-                markup: True
-            MDLabel:
-                id: loss_tip
-                pos_hint:{'x': .05, 'center_y': .5}
-                theme_text_color: 'Custom'
-                text_color: 1,1,1,1
-                font_name: 'asset/fonts/tway_air.ttf'
-                markup: True
-            MDLabel:
-                id: val_loss_tip
-                pos_hint:{'x': .05, 'center_y': .5}
-                theme_text_color: 'Custom'
-                text_color: 1,1,1,1
-                font_name: 'asset/fonts/tway_air.ttf'
-                markup: True
-        FloatLayout:
-            id: idx_legend
-            size_hint: None, None
-            size: 120, 40
-            pos: graph_plot.x + graph_plot.width - 130, graph_plot.y + graph_plot.height - 50
-            canvas.before:
-                Color:
-                    rgba: utils.get_color_from_hex('#000000CC')
-                RoundedRectangle:
-                    pos: self.pos
-                    size: self.size
-            MDLabel:
-                id: idx_legend_label
-                size: 120, 40
-                pos: idx_legend.x + 10, idx_legend.y
-                #pos_hint:{'center_x': .5, 'center_y': .5}
-                theme_text_color: 'Custom'
-                text_color: 1,1,1,1
-                font_name: 'asset/fonts/tway_air.ttf'
-                markup: True
+            size_hint: 1, 1
         BoxLayout:
             id: legend
             orientation: 'vertical'
             size_hint: None, None
-            size: 125, 80
-            pos: graph_plot.x + graph_plot.width - 135, graph_plot.y + graph_plot.height - 75
+            size: 90, 50
+            pos: graph_plot.x + graph_plot.width - 100, graph_plot.y + graph_plot.height - 60
             canvas.before:
                 Color:
                     rgba: utils.get_color_from_hex('#000000CC')
@@ -93,42 +56,88 @@
                     pos: self.pos
                     size: self.size
             MDLabel:
-                id: legend_acc
-                text: '[color=3B689B]●[/color] Accuracy'
+                id: legend_label
+                text: '-'
                 pos_hint:{'x': .05, 'center_y': .5}
                 theme_text_color: 'Custom'
                 text_color: 1,1,1,1
-                font_name: 'asset/fonts/tway_air.ttf'
+                font_name: 'assets/fonts/tway_air.ttf'
                 font_size: 14
                 markup: True
             MDLabel:
-                id: legend_val_acc
-                text: '[color=16A364]●[/color] Val Accuracy'
+                id: legend_val_label
+                text: '-'
                 pos_hint:{'x': .05, 'center_y': .5}
                 theme_text_color: 'Custom'
                 text_color: 1,1,1,1
-                font_name: 'asset/fonts/tway_air.ttf'
+                font_name: 'assets/fonts/tway_air.ttf'
                 font_size: 14
                 markup: True
+        FloatLayout:
+            id: idx_legend
+            size_hint: None, None
+            size: 130, 25
+            pos: graph_plot.x + graph_plot.width - 140, graph_plot.y + graph_plot.height - 35
+            canvas.before:
+                Color:
+                    rgba: utils.get_color_from_hex('#000000CC')
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+            FloatLayout:
+                pos: idx_legend.x + 10, idx_legend.y
+                size_hint: None, None
+                size: 50, 25
+                MDLabel:
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: 'Index:'
+                    halign: 'left'
+                    theme_text_color: 'Custom'
+                    text_color: 1,1,1,1
+                    font_name: 'assets/fonts/tway_air.ttf'
+                    markup: True
+            FloatLayout:
+                pos: idx_legend.x + 50, idx_legend.y
+                size_hint: None, None
+                size: 70, 25
+                MDLabel:
+                    id: idx_legend_label
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: '-'
+                    halign: 'right'
+                    theme_text_color: 'Custom'
+                    text_color: 1,1,1,1
+                    font_name: 'assets/fonts/tway_air.ttf'
+                    markup: True
+        BoxLayout:
+            id: tooltips
+            orientation: 'vertical'
+            size_hint: None, None
+            size: 150, 50
+            canvas.before:
+                Color:
+                    rgba: utils.get_color_from_hex('#000000CC')
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
             MDLabel:
-                id: legend_loss
-                text: '[color=fc444f]●[/color] Loss'
+                id: value_tip
+                text: '-'
                 pos_hint:{'x': .05, 'center_y': .5}
                 theme_text_color: 'Custom'
                 text_color: 1,1,1,1
-                font_name: 'asset/fonts/tway_air.ttf'
-                font_size:14
-                markup: True
-            MDLabel:
-                id: legend_val_loss
-                text: '[color=f5aa31]●[/color] Val Loss'
-                pos_hint:{'x': .05, 'center_y': .5}
-                theme_text_color: 'Custom'
-                text_color: 1,1,1,1
-                font_name: 'asset/fonts/tway_air.ttf'
                 font_size: 14
+                font_name: 'assets/fonts/tway_air.ttf'
                 markup: True
-
+            MDLabel:
+                id: value_val_tip
+                text: '-'
+                pos_hint:{'x': .05, 'center_y': .5}
+                theme_text_color: 'Custom'
+                text_color: 1,1,1,1
+                font_size: 14
+                font_name: 'assets/fonts/tway_air.ttf'
+                markup: True
 <DashboardScreen>
     MDToolbar:
         id: toolbar
@@ -136,245 +145,892 @@
         elevation: 10
         title: 'DeepMom'
         right_action_items: [['file-export-outline', app.export_file],['trash-can-outline', app.discard_data],['cog', app.set_epochs]]
-        md_bg_color: utils.get_color_from_hex('#C2E2C380')
     FloatLayout:
         id: base_canvas
         size_hint: None, None
-        size: root.width, root.height - toolbar.height
+        size: window.width, window.height - toolbar.height
         canvas.before:
             Color:
-                #rgba: utils.get_color_from_hex('#000000')
-                rgba: utils.get_color_from_hex('#F4F4F6')
+                rgba: utils.get_color_from_hex('#1D1C2BFF')
             Rectangle:
                 pos: self.pos
                 size: self.size
         FloatLayout:
             id: info_canvas_base
             pos_hint: {'x': 0, 'top':1}
-            size_hint: 1, .25
-            MDFloatLayout:
+            size_hint: None, None
+            size: base_canvas.width, 80
+            FloatLayout:
                 id: info_canvas
-                pos: info_canvas_base.x + 10 , info_canvas_base.y
+                pos: info_canvas_base.x + 20, info_canvas_base.y
                 size_hint: None, None
-                size: info_canvas_base.width - 20, info_canvas_base.height - 10
+                size: info_canvas_base.width - 40, 40
                 FloatLayout:
-                    id: accuracy_info_header
+                    id: max_acc
+                    pos: info_canvas.x, info_canvas.y
                     size_hint: None, None
-                    size: accuracy_info.width, accuracy_info.height/3
-                    pos: accuracy_info.x, accuracy_info.y + accuracy_info.height
+                    size: ((info_canvas.width / 2) - 70)/4, info_canvas.height
                     canvas.before:
                         Color:
-                            rgba: utils.get_color_from_hex('#3B689BFF')
+                            rgba: utils.get_color_from_hex('#26283A')
                         RoundedRectangle:
                             pos: self.pos
                             size: self.size
-                            radius: [(10.0, 10.0), (10.0, 10.0), (0.0, 0.0), (0.0, 0.0)]
-                    MDLabel:
-                        text: 'Max Acc'
-                        theme_text_color: 'Custom'
-                        text_color: 1,1,1,1
-                        font_name: 'asset/fonts/tway_air.ttf'
-                        font_size: (self.height * 0.25 + self.width * 0.25)/2.5
-                        halign: 'center'
-                        pos_hint: {'center_x': .5, 'center_y': .5}
-                FloatLayout:
-                    id: accuracy_info
-                    pos_hint: {'x': 0, 'y': 0}
-                    size_hint: None, None
-                    size: (info_canvas.width-50)/6, (info_canvas.height/4)*3
-                    canvas.before:
-                        Color:
-                            rgba: utils.get_color_from_hex('#FFFFFFFF')
-                        RoundedRectangle:
-                            pos: self.pos
-                            size: self.size
-                            radius: [(0.0, 0.0), (0.0, 0.0), (10.0, 10.0), (10.0, 10.0)]
-                    MDLabel:
-                        id: max_acc
-                        text: 'Unknown'
-                        font_size: (self.height * 0.25 + self.width * 0.25)/2
-                        halign: 'center'
-                        pos_hint: {'center_x': .5, 'center_y': .5}
-                FloatLayout:
-                    id: val_accuracy_info_header
-                    size_hint: None, None
-                    size: accuracy_info.width, accuracy_info.height/3
-                    pos: accuracy_info_header.x + accuracy_info_header.width + 10, accuracy_info_header.y
-                    canvas.before:
-                        Color:
-                            rgba: utils.get_color_from_hex('#16A364FF')
-                        RoundedRectangle:
-                            pos: self.pos
-                            size: self.size
-                            radius: [(10.0, 10.0), (10.0, 10.0), (0.0, 0.0), (0.0, 0.0)]
-                    MDLabel:
-                        text: 'Max valAcc'
-                        theme_text_color: 'Custom'
-                        text_color: 1,1,1,1
-                        font_name: 'asset/fonts/tway_air.ttf'
-                        font_size: (self.height * 0.25 + self.width * 0.25)/2.5
-                        halign: 'center'
-                        pos_hint: {'center_x': .5, 'center_y': .5}
-                FloatLayout:
-                    id: val_accuracy_info
-                    pos: accuracy_info.x + accuracy_info.width + 10, info_canvas.y
-                    size_hint: None, None
-                    size: (info_canvas.width-50)/6, (info_canvas.height/4)*3
-                    canvas.before:
-                        Color:
-                            rgba: utils.get_color_from_hex('#FFFFFFFF')
-                        RoundedRectangle:
-                            pos: self.pos
-                            size: self.size
-                            radius: [(0.0, 0.0), (0.0, 0.0), (10.0, 10.0), (10.0, 10.0)]
-                    MDLabel:
-                        id: max_val_acc
-                        text: 'Unknown'
-                        font_size: (self.height * 0.25 + self.width * 0.25)/2
-                        halign: 'center'
-                        pos_hint: {'center_x': .5, 'center_y': .5}
-                FloatLayout:
-                    id: loss_info_header
-                    size_hint: None, None
-                    size: accuracy_info.width, accuracy_info.height/3
-                    pos: val_accuracy_info_header.x + val_accuracy_info_header.width + 10, val_accuracy_info_header.y
-                    canvas.before:
-                        Color:
-                            rgba: utils.get_color_from_hex('#FC444FFF')
-                        RoundedRectangle:
-                            pos: self.pos
-                            size: self.size
-                            radius: [(10.0, 10.0), (10.0, 10.0), (0.0, 0.0), (0.0, 0.0)]
-                    MDLabel:
-                        text: 'Min Loss'
-                        theme_text_color: 'Custom'
-                        text_color: 1,1,1,1
-                        font_name: 'asset/fonts/tway_air.ttf'
-                        font_size: (self.height * 0.25 + self.width * 0.25)/2.5
-                        halign: 'center'
-                        pos_hint: {'center_x': .5, 'center_y': .5}
-                FloatLayout:
-                    id: loss_info
-                    size_hint: None, None
-                    pos: val_accuracy_info.x + val_accuracy_info.width + 10, info_canvas.y
-                    size: (info_canvas.width-50)/6, (info_canvas.height/4)*3
-                    canvas.before:
-                        Color:
-                            rgba: utils.get_color_from_hex('#FFFFFFFF')
-                        RoundedRectangle:
-                            pos: self.pos
-                            size: self.size
-                            radius: [(0.0, 0.0), (0.0, 0.0), (10.0, 10.0), (10.0, 10.0)]
-                    MDLabel:
-                        id: min_loss
-                        text: 'Unknown'
-                        font_size: (self.height * 0.25 + self.width * 0.25)/2
-                        halign: 'center'
-                        pos_hint: {'center_x': .5, 'center_y': .5}
-                FloatLayout:
-                    id: val_loss_info_header
-                    size_hint: None, None
-                    size: accuracy_info.width, accuracy_info.height/3
-                    pos: loss_info.x + loss_info.width + 10, loss_info_header.y
-                    canvas.before:
-                        Color:
-                            rgba: utils.get_color_from_hex('#F5AA31FF')
-                        RoundedRectangle:
-                            pos: self.pos
-                            size: self.size
-                            radius: [(10.0, 10.0), (10.0, 10.0), (0.0, 0.0), (0.0, 0.0)]
-                    MDLabel:
-                        text: 'Min valLoss'
-                        theme_text_color: 'Custom'
-                        text_color: 1,1,1,1
-                        font_name: 'asset/fonts/tway_air.ttf'
-                        font_size: (self.height * 0.25 + self.width * 0.25)/2.5
-                        halign: 'center'
-                        pos_hint: {'center_x': .5, 'center_y': .5}
-                FloatLayout:
-                    id: val_loss_info
-                    size_hint: None, None
-                    pos: loss_info.x + loss_info.width + 10, info_canvas.y
-                    size: (info_canvas.width-50)/6, (info_canvas.height/4)*3
-                    canvas.before:
-                        Color:
-                            rgba: utils.get_color_from_hex('#FFFFFFFF')
-                        RoundedRectangle:
-                            pos: self.pos
-                            size: self.size
-                            radius: [(0.0, 0.0), (0.0, 0.0), (10.0, 10.0), (10.0, 10.0)]
-                    MDLabel:
-                        id: min_val_loss
-                        text: 'Unknown'
-                        font_size: (self.height * 0.25 + self.width * 0.25)/2
-                        halign: 'center'
-                        pos_hint: {'center_x': .5, 'center_y': .5}
-                FloatLayout:
-                    id: ETA
-                    pos: val_loss_info.x + val_loss_info.width + 10, info_canvas.y
-                    size_hint: None, None
-                    size: info_canvas.height, info_canvas.height
-                    canvas.before:
-                        Color:
-                            rgba: utils.get_color_from_hex('#FFFFFFFF')
-                        RoundedRectangle:
-                            pos: self.pos
-                            size: self.size
-                            radius: [(10.0, 10.0), (10.0, 10.0), (10.0, 10.0), (10.0, 10.0)]
-                    MDLabel:
-                        text: 'ETA'
-                        halign: 'center'
-                        pos_hint: {'center_x': .5, 'center_y': .65}
-                        font_size: (self.height * 0.25 + self.width * 0.25)/1.5
-                        font_name: 'asset/fonts/KOTRA_BOLD.ttf'
-                    MDLabel:
-                        id: remain_time
-                        text: 'Unknown'
-                        halign: 'center'
-                        pos_hint: {'center_x': .5, 'center_y': .25}
-                        font_size: (self.height * 0.25 + self.width * 0.25)/2.5
-                        font_name: 'asset/fonts/PretendardVariable.ttf'
+                            radius: [0, 0, 5, 5]
                     FloatLayout:
-                        id: progress
-                        pos: ETA.x + ETA.width + 10, info_canvas.y
+                        pos: max_acc.x, max_acc.y
                         size_hint: None, None
-                        size: (info_canvas.width-50)/6 + (val_loss_info.width - ETA.width), info_canvas.height
+                        size: max_acc.width, max_acc.height
+                        MDLabel:
+                            id: max_acc_label
+                            text: '[color=3b689b]●[/color] -'
+                            markup: True
+                            font_size: self.width * .02 + 16
+                            halign: 'center'
+                            pos_hint: {'center_x': .5, 'center_y': .49}
+                            font_name: 'assets/fonts/paybooc_Bold.ttf'
+                    FloatLayout:
+                        id: max_acc_head
+                        pos: max_acc.x, max_acc.y + max_acc.height
+                        size_hint: None, None
+                        size: max_acc.width, 20
                         canvas.before:
                             Color:
-                                rgba: utils.get_color_from_hex('#FFFFFFFF')
+                                rgba: utils.get_color_from_hex('#26283A')
                             RoundedRectangle:
                                 pos: self.pos
                                 size: self.size
-                        MDProgressBar:
-                            id: progress_bar
-                            size_hint: None, None
-                            size: progress.width*.8, progress.height*.2
-                            pos_hint: {'center_x': .5, 'center_y': .3}
-                            value: 0
-                            color: utils.get_color_from_hex('#A465D4')
+                                radius: [5, 5, 0, 0]
+                            Color:
+                                rgba: utils.get_color_from_hex('#3B689B')
+                            Line:
+                                points:(self.x + 10, self.y - 2, self.x + self.width - 10, self.y - 2)
+                                width: .3
+                    FloatLayout:
+                        pos: max_acc_head.x + 10, max_acc_head.y
+                        size_hint: None, None
+                        size: max_acc_head.width - 10, max_acc_head.height
+                        canvas.before:
                         MDLabel:
-                            id: progress_value
-                            text: 'Unknown'
-                            font_size: (self.height * 0.25 + self.width * 0.25)/2
-                            halign: 'center'
-                            pos_hint: {'center_x': .5, 'center_y': .6}
+                            pos_hint: {'x': 1, 'center_y': .5}
+                            text: 'Max Accuracy'
                             markup: True
+                            font_size: self.width * .015 + 12
+                            halign: 'left'
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            font_name: 'assets/fonts/tway_air.ttf'
+
+                FloatLayout:
+                    id: max_val_acc
+                    pos: max_acc.x + max_acc.width + 20, max_acc.y
+                    size_hint: None, None
+                    size: max_acc.width, max_acc.height
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#26283A')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [0, 0, 5, 5]
+                    FloatLayout:
+                        pos: max_val_acc.x, max_val_acc.y
+                        size_hint: None, None
+                        size: max_val_acc.width, max_val_acc.height
                         MDLabel:
-                            id: progress_epochs
-                            text: 'Unknown'
-                            font_size: (self.height * 0.25 + self.width * 0.25)/8
+                            id: max_val_acc_label
+                            text: '[color=16a364]●[/color] -'
+                            markup: True
+                            font_size: self.width * .02 + 16
                             halign: 'center'
-                            pos_hint: {'center_x': .5, 'center_y': .15}
+                            pos_hint: {'center_x': .5, 'center_y': .49}
+                            font_name: 'assets/fonts/paybooc_Bold.ttf'
+                    FloatLayout:
+                        id: max_val_acc_head
+                        pos: max_val_acc.x, max_val_acc.y + max_val_acc.height
+                        size_hint: None, None
+                        size: max_val_acc.width, 20
+                        canvas.before:
+                            Color:
+                                rgba: utils.get_color_from_hex('#26283A')
+                            RoundedRectangle:
+                                pos: self.pos
+                                size: self.size
+                                radius: [5, 5, 0, 0]
+                            Color:
+                                rgba: utils.get_color_from_hex('#16A364')
+                            Line:
+                                points:(self.x + 10, self.y - 2, self.x + self.width - 10, self.y - 2)
+                                width: .3
+                    FloatLayout:
+                        pos: max_val_acc_head.x + 10, max_val_acc_head.y
+                        size_hint: None, None
+                        size: max_val_acc_head.width - 10, max_val_acc_head.height
+                        canvas.before:
+                        MDLabel:
+                            pos_hint: {'x': 1, 'center_y': .5}
+                            text: 'Max Val Accuracy'
+                            markup: True
+                            font_size: self.width * .015 + 12
+                            halign: 'left'
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            font_name: 'assets/fonts/tway_air.ttf'
+                FloatLayout:
+                    id: min_loss
+                    pos: max_val_acc.x + max_val_acc.width + 20, max_val_acc.y
+                    size_hint: None, None
+                    size: max_val_acc.width, max_val_acc.height
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#26283A')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [0, 0, 5, 5]
+                    FloatLayout:
+                        pos: min_loss.x, min_loss.y
+                        size_hint: None, None
+                        size: min_loss.width, min_loss.height
+                        MDLabel:
+                            id: min_loss_label
+                            text: '[color=fc444f]●[/color] -'
+                            markup: True
+                            font_size: self.width * .02 + 16
+                            halign: 'center'
+                            pos_hint: {'center_x': .5, 'center_y': .49}
+                            font_name: 'assets/fonts/paybooc_Bold.ttf'
+                    FloatLayout:
+                        id: min_loss_head
+                        pos: min_loss.x, min_loss.y + min_loss.height
+                        size_hint: None, None
+                        size: min_loss.width, 20
+                        canvas.before:
+                            Color:
+                                rgba: utils.get_color_from_hex('#26283A')
+                            RoundedRectangle:
+                                pos: self.pos
+                                size: self.size
+                                radius: [5, 5, 0, 0]
+                            Color:
+                                rgba: utils.get_color_from_hex('#FC444F')
+                            Line:
+                                points:(self.x + 10, self.y - 2, self.x + self.width - 10, self.y - 2)
+                                width: .3
+                    FloatLayout:
+                        pos: min_loss_head.x + 10, min_loss_head.y
+                        size_hint: None, None
+                        size: min_loss_head.width - 10, min_loss_head.height
+                        canvas.before:
+                        MDLabel:
+                            pos_hint: {'x': 1, 'center_y': .5}
+                            text: 'Min Loss'
+                            markup: True
+                            font_size: self.width * .015 + 12
+                            halign: 'left'
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            font_name: 'assets/fonts/tway_air.ttf'
+                FloatLayout:
+                    id: min_val_loss
+                    pos: min_loss.x + min_loss.width + 20, min_loss.y
+                    size_hint: None, None
+                    size: min_loss.width, min_loss.height
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#26283A')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [0, 0, 5, 5]
+                    FloatLayout:
+                        pos: min_val_loss.x, min_val_loss.y
+                        size_hint: None, None
+                        size: min_val_loss.width, min_val_loss.height
+                        MDLabel:
+                            id: min_val_loss_label
+                            text: '[color=f5aa31]●[/color] -'
+                            markup: True
+                            font_size: self.width * .02 + 16
+                            halign: 'center'
+                            pos_hint: {'center_x': .5, 'center_y': .49}
+                            font_name: 'assets/fonts/paybooc_Bold.ttf'
+                    FloatLayout:
+                        id: min_val_loss_head
+                        pos: min_val_loss.x, min_val_loss.y + min_val_loss.height
+                        size_hint: None, None
+                        size: min_val_loss.width, 20
+                        canvas.before:
+                            Color:
+                                rgba: utils.get_color_from_hex('#26283A')
+                            RoundedRectangle:
+                                pos: self.pos
+                                size: self.size
+                                radius: [5, 5, 0, 0]
+                            Color:
+                                rgba: utils.get_color_from_hex('#F5AA31')
+                            Line:
+                                points:(self.x + 10, self.y - 2, self.x + self.width - 10, self.y - 2)
+                                width: .3
+                    FloatLayout:
+                        pos: min_val_loss_head.x + 10, min_val_loss_head.y
+                        size_hint: None, None
+                        size: min_val_loss_head.width - 10, min_val_loss_head.height
+                        canvas.before:
+                        MDLabel:
+                            pos_hint: {'x': 1, 'center_y': .5}
+                            text: 'Min Val Loss'
+                            markup: True
+                            font_size: self.width * .015 + 12
+                            halign: 'left'
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            font_name: 'assets/fonts/tway_air.ttf'
+                FloatLayout:
+                    id: ETA
+                    pos: min_val_loss.x + min_val_loss.width + 20, min_val_loss.y
+                    size_hint: None, None
+                    size: ((info_canvas.width / 2) - 30 ) / 2, 40
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#26283A')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [0, 0, 5, 5]
+                    FloatLayout:
+                        pos: ETA.x, ETA.y
+                        size_hint: None, None
+                        size: ETA.width - 20, ETA.height
+                        MDLabel:
+                            id: ETA_label
+                            text: '00:00:00 / 0.000 [size=12]epoch per sec[/size]'
+                            markup: True
+                            font_size: 17
+                            halign: 'center'
+                            pos_hint: {'center_x': .5, 'center_y': .49}
+                            font_name: 'assets/fonts/KOTRA_BOLD.ttf'
+                    FloatLayout:
+                        id: ETA_head
+                        pos: min_val_loss.x + min_val_loss.width + 20, min_val_loss.y + 40
+                        size_hint: None, None
+                        size: ((info_canvas.width / 2) - 30 ) / 2, 20
+                        canvas.before:
+                            Color:
+                                rgba: utils.get_color_from_hex('#26283A')
+                            RoundedRectangle:
+                                pos: self.pos
+                                size: self.size
+                                radius: [5, 5, 0, 0]
+                            Color:
+                                rgba: utils.get_color_from_hex('#607D8B')
+                            Line:
+                                points:(self.x + 10, self.y - 2, self.x + self.width - 10, self.y - 2)
+                                width: .3
+                        FloatLayout:
+                            pos: ETA_head.x + 10, ETA_head.y
+                            size_hint: None, None
+                            size: ETA_head.width - 10, ETA_head.height
+                            canvas.before:
+                            MDLabel:
+                                pos_hint: {'x': 1, 'center_y': .5}
+                                text: 'Estimated time of arrival'
+                                markup: True
+                                font_size: 12
+                                halign: 'left'
+                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                font_name: 'assets/fonts/tway_air.ttf'
+                FloatLayout:
+                    id: percent_epoch
+                    pos: ETA.x + ETA.width + 20, ETA.y
+                    size_hint: None, None
+                    size: 60, ETA.height
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#26283A')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [0, 0, 0, 5]
+                    MDLabel:
+                        id: percent_epoch_label
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        text: '00.00%'
+                        markup: True
+                        font_size: self.width * .015 + 14
+                        halign: 'right'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/tway_air.ttf'
+                FloatLayout:
+                    id: epoch_porgress
+                    pos: ETA.x + ETA.width + percent_epoch.width + 20, ETA.y
+                    size_hint: None, None
+                    size: ETA.width - 60, ETA.height
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#26283A')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [0, 0, 5, 0]
+                    MDProgressBar:
+                        id: progress_bar
+                        size_hint: None, None
+                        size: epoch_porgress.width*.9, epoch_porgress.height*.2
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        value: 0
+                        color: utils.get_color_from_hex('#A465D4')
+                    FloatLayout:
+                        id: epoch_porgress_head
+                        pos: ETA_head.x + ETA_head.width + 20, ETA_head.y
+                        size_hint: None, None
+                        size: ETA_head.width, ETA_head.height
+                        canvas.before:
+                            Color:
+                                rgba: utils.get_color_from_hex('#26283A')
+                            RoundedRectangle:
+                                pos: self.pos
+                                size: self.size
+                                radius: [5, 5, 0, 0]
+                            Color:
+                                rgba: utils.get_color_from_hex('#A465D4')
+                            Line:
+                                points:(self.x + 10, self.y - 2, self.x + self.width - 10, self.y - 2)
+                                width: .3
+                    FloatLayout:
+                        id: current_epoch
+                        pos: epoch_porgress_head.x + 10, epoch_porgress_head.y
+                        size_hint: None, None
+                        size: epoch_porgress_head.width - 10, epoch_porgress_head.height
+                        canvas.before:
+                        MDLabel:
+                            id: current_epoch_label
+                            pos_hint: {'x': 1, 'center_y': .5}
+                            text: 'Epochs  0 / 500'
+                            markup: True
+                            font_size: 12
+                            halign: 'left'
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            font_name: 'assets/fonts/tway_air.ttf'
         FloatLayout:
-            id: hover_graph_canvas
-            pos_hint: {'x': 0, 'y':0}
-            size_hint: 1, .75
-            canvas.before:
-                Color:
-                    rgba: utils.get_color_from_hex('#00000000')
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
+            id: data_canvas_base
+            size_hint: None, None
+            size: (base_canvas.width - 60)/5 * 1.5, base_canvas.height - 120
+            pos: 20, 20
+            FloatLayout:
+                id: topic_bar
+                size_hint: None, None
+                size: (base_canvas.width - 60)/5 * 1.5, 35
+                pos: 20, 20
+                canvas.before:
+                    Color:
+                        rgba: utils.get_color_from_hex('#26283A')
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [0, 0, 5, 5]
+            FloatLayout:
+                id: topic
+                size_hint: None, None
+                size: topic_bar.width - 10, topic_bar.height
+                pos: topic_bar.x + 10, topic_bar.y
+                MDLabel:
+                    id: topic_label
+                    pos_hint: {'x': 1, 'center_y': .55}
+                    text: '-'
+                    markup: True
+                    font_size: 16
+                    halign: 'left'
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    font_name: 'assets/fonts/PretendardVariable.ttf'
+            FloatLayout:
+                id: topic_bar_head
+                size_hint: None, None
+                size: (base_canvas.width - 60)/5 * 1.5, 25
+                pos: 20, 55
+                canvas.before:
+                    Color:
+                        rgba: utils.get_color_from_hex('#26283A')
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [5, 5, 0, 0]
+                    Color:
+                        rgba: utils.get_color_from_hex('#607D8B')
+                    Line:
+                        points:(self.x + 10, self.y, self.x + self.width - 10, self.y)
+                        width: .3
+            FloatLayout:
+                size_hint: None, None
+                size: topic_bar_head.width - 10, topic_bar_head.height
+                pos: topic_bar_head.x + 10, topic_bar_head.y
+                MDLabel:
+                    pos_hint: {'x': 1, 'center_y': .5}
+                    text: 'Subscribe topic'
+                    markup: True
+                    font_size: 10.5
+                    halign: 'left'
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    font_name: 'assets/fonts/tway_air.ttf'
+            FloatLayout:
+                id: data_table
+                size_hint: None, None
+                size: (base_canvas.width - 60)/5 * 1.5, data_canvas_base.height - 250
+                pos: topic_bar.x, topic_bar.y + topic_bar.height + 45
+                canvas.before:
+                    Color:
+                        rgba: utils.get_color_from_hex('#26283A')
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [5, 5, 5, 5]
+            FloatLayout:
+                id: val_loss_data_set
+                size_hint: None, None
+                size: data_table.width, data_table.height / 5
+                pos: data_table.x, data_table.y
+                canvas.before:
+                    Color:
+                        rgba: utils.get_color_from_hex('#404252')
+                    Line:
+                        points:(self.x, self.y + self.height, self.x + self.width, self.y + self.height)
+                        width: 1
+                FloatLayout:
+                    id: val_loss_param
+                    size_hint: None, None
+                    size: val_loss_data_set.width / 3 - 15, val_loss_data_set.height
+                    pos: val_loss_data_set.x + 15, val_loss_data_set.y
+                    MDLabel:
+                        text: 'Val Loss'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/3
+                        markup: True
+                        halign: 'left'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/tway_air.ttf'
+                FloatLayout:
+                    id: val_loss_data
+                    size_hint: None, None
+                    size: val_loss_data_set.width / 3, val_loss_data_set.height
+                    pos: val_loss_param.x + val_loss_param.width, val_loss_data_set.y
+                    MDLabel:
+                        id: val_loss_data_label
+                        text: '-'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/2.8
+                        markup: True
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/PretendardVariable.ttf'
+                FloatLayout:
+                    id: val_loss_rate
+                    size_hint: None, None
+                    size: val_loss_data_set.width / 3, val_loss_data_set.height
+                    pos: val_loss_data.x + val_loss_data.width, val_loss_data_set.y
+                    MDLabel:
+                        id: val_loss_rate_label
+                        text: '-'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/2.8
+                        markup: True
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/paybooc_Bold.ttf'  
+            FloatLayout:
+                id: loss_data_set
+                size_hint: None, None
+                size: data_table.width, (data_table.height) / 5
+                pos: data_table.x, val_loss_data_set.y + (data_table.height) / 5
+                canvas.before:
+                    Color:
+                        rgba: utils.get_color_from_hex('#404252')
+                    Line:
+                        points:(self.x, self.y + self.height, self.x + self.width, self.y + self.height)
+                        width: 1
+                FloatLayout:
+                    id: loss_param
+                    size_hint: None, None
+                    size: loss_data_set.width / 3 - 15, loss_data_set.height
+                    pos: loss_data_set.x + 15, loss_data_set.y
+                    MDLabel:
+                        text: 'Loss'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/3
+                        markup: True
+                        halign: 'left'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/tway_air.ttf'
+                FloatLayout:
+                    id: loss_data
+                    size_hint: None, None
+                    size: loss_data_set.width / 3, loss_data_set.height
+                    pos: loss_param.x + loss_param.width, loss_data_set.y
+                    MDLabel:
+                        id: loss_data_label
+                        text: '-'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/2.8
+                        markup: True
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/PretendardVariable.ttf'
+                FloatLayout:
+                    id: loss_rate
+                    size_hint: None, None
+                    size: loss_data_set.width / 3, loss_data_set.height
+                    pos: loss_data.x + loss_data.width, loss_data_set.y
+                    MDLabel:
+                        id: loss_rate_label
+                        text: '-'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/2.8
+                        markup: True
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/paybooc_Bold.ttf' 
+            FloatLayout:
+                id: val_acc_data_set
+                size_hint: None, None
+                size: data_table.width, (data_table.height) / 5
+                pos: data_table.x, loss_data_set.y + (data_table.height) / 5
+                canvas.before:
+                    Color:
+                        rgba: utils.get_color_from_hex('#404252')
+                    Line:
+                        points:(self.x, self.y + self.height, self.x + self.width, self.y + self.height)
+                        width: 1
+                FloatLayout:
+                    id: val_acc_param
+                    size_hint: None, None
+                    size: val_acc_data_set.width / 3 - 15, val_acc_data_set.height
+                    pos: val_acc_data_set.x + 15, val_acc_data_set.y
+                    MDLabel:
+                        text: 'Val Acc'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/2.8
+                        markup: True
+                        halign: 'left'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/tway_air.ttf'
+                FloatLayout:
+                    id: val_acc_data
+                    size_hint: None, None
+                    size: val_acc_data_set.width / 3, val_acc_data_set.height
+                    pos: val_acc_param.x + val_acc_param.width, val_acc_data_set.y
+                    MDLabel:
+                        id: val_acc_data_label
+                        text: '-'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/2.8
+                        markup: True
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/PretendardVariable.ttf'
+                FloatLayout:
+                    id: val_acc_rate
+                    size_hint: None, None
+                    size: val_acc_data_set.width / 3, val_acc_data_set.height
+                    pos: val_acc_data.x + val_acc_data.width, val_acc_data_set.y
+                    MDLabel:
+                        id: val_acc_rate_label
+                        text: '-'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/2.8
+                        markup: True
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/paybooc_Bold.ttf' 
+            FloatLayout:
+                id: acc_data_set
+                size_hint: None, None
+                size: data_table.width, (data_table.height) / 5
+                pos: data_table.x, val_acc_data_set.y + (data_table.height) / 5
+                canvas.before:
+                    Color:
+                        rgba: utils.get_color_from_hex('#404252')
+                    Line:
+                        points:(self.x, self.y + self.height, self.x + self.width, self.y + self.height)
+                        width: 1
+                FloatLayout:
+                    id: acc_param
+                    size_hint: None, None
+                    size: acc_data_set.width / 3 - 15, acc_data_set.height
+                    pos: acc_data_set.x + 15, acc_data_set.y
+                    MDLabel:        
+                        text: 'Acc'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/2.8
+                        markup: True
+                        halign: 'left'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/tway_air.ttf'
+                FloatLayout:
+                    id: acc_data
+                    size_hint: None, None
+                    size: acc_data_set.width / 3, acc_data_set.height
+                    pos: acc_param.x + acc_param.width, acc_data_set.y
+                    MDLabel:
+                        id: acc_data_label
+                        text: '-'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/2.8
+                        markup: True
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/PretendardVariable.ttf'
+                FloatLayout:
+                    id: acc_rate
+                    size_hint: None, None
+                    size: acc_data_set.width / 3, acc_data_set.height
+                    pos: acc_data.x + acc_data.width, acc_data_set.y
+                    MDLabel:
+                        id: acc_rate_label
+                        text: '-'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/2.8
+                        markup: True
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/paybooc_Bold.ttf'   
+            FloatLayout:
+                id: cloum
+                size_hint: None, None
+                size: data_table.width, (data_table.height) / 5
+                pos: data_table.x, acc_data_set.y + (data_table.height) / 5
+                FloatLayout:
+                    id: cloum_param
+                    size_hint: None, None
+                    size: cloum.width / 3 - 10, cloum.height
+                    pos: cloum.x + 10, cloum.y
+                    MDLabel:        
+                        text: 'Param'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/2
+                        markup: True
+                        halign: 'left'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/tway_air.ttf'
+                FloatLayout:
+                    id: cloum_data
+                    size_hint: None, None
+                    size: cloum.width / 3, cloum.height
+                    pos: cloum_param.x + cloum_param.width, cloum.y
+                    MDLabel:
+                        text: 'Value'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/2
+                        markup: True
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/tway_air.ttf'
+                FloatLayout:
+                    id: cloum_rate
+                    size_hint: None, None
+                    size: cloum.width / 3, cloum.height
+                    pos: cloum_data.x + cloum_data.width, cloum.y
+                    MDLabel:        
+                        text: 'Rate'
+                        font_size: (self.height * 0.25 + self.width * 0.25)/2
+                        markup: True
+                        halign: 'center'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/tway_air.ttf'
+            FloatLayout:
+                id: search_result_base
+                size_hint: None, None
+                size: (base_canvas.width - 60)/5 * 1.5, 80
+                pos: 20, data_table.y + data_table.height + 20
+                FloatLayout:
+                    id: search_loss_head
+                    size_hint: None, None
+                    size: (search_result_base.height - 10) / 2, (search_result_base.height - 10) / 2
+                    pos: search_result_base.pos
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#FC444F')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [5, 0, 0, 5]
+                    MDIcon:
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        halign: "center"
+                        icon: "magnify"
+                        theme_text_color: 'Custom'
+                        text_color: utils.get_color_from_hex('#26283A')
+                FloatLayout:
+                    id: search_loss
+                    size_hint: None, None
+                    size: ((search_result_base.width - 10) / 2) - search_loss_head.width, search_loss_head.height
+                    pos: search_result_base.x + search_loss_head.width, search_result_base.y
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#26283A')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [0, 5, 5, 0]
+                FloatLayout:
+                    pos: search_loss.x + 10, search_loss.y
+                    size_hint: None, None
+                    size: search_loss.size                    
+                    MDLabel:
+                        id: search_loss_label
+                        pos_hint: {'x': 1, 'center_y': .5}
+                        text: '-'
+                        markup: True
+                        font_size: self.width * .02 + 14
+                        halign: 'left'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/PretendardVariable.ttf'           
+                FloatLayout:
+                    id: search_val_loss_head
+                    size_hint: None, None
+                    size: search_loss_head.size
+                    pos: search_loss.x + search_loss.width + 10, search_loss.y
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#F5AA31')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [5, 0, 0, 5]
+                    MDIcon:
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        halign: "center"
+                        icon: "magnify"
+                        theme_text_color: 'Custom'
+                        text_color: utils.get_color_from_hex('#26283A')
+                FloatLayout:
+                    id: search_val_loss
+                    size_hint: None, None
+                    size: search_loss.size
+                    pos: search_loss.x + search_loss.width + search_loss.height + 10, search_loss.y
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#26283A')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [0, 5, 5, 0]
+                FloatLayout:
+                    pos: search_val_loss.x + 10, search_val_loss.y
+                    size_hint: None, None
+                    size: search_loss.size                    
+                    MDLabel:
+                        id: search_val_loss_label
+                        pos_hint: {'x': 1, 'center_y': .5}
+                        text: '-'
+                        markup: True
+                        font_size: self.width * .02 + 14
+                        halign: 'left'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/PretendardVariable.ttf'
+                FloatLayout:
+                    id: search_acc_head
+                    size_hint: None, None
+                    size: search_loss_head.size
+                    pos: search_loss_head.x, search_loss.y + search_loss_head.height + 10
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#3B689B')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [5, 0, 0, 5]
+                    MDIcon:
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        halign: "center"
+                        icon: "magnify"
+                        theme_text_color: 'Custom'
+                        text_color: utils.get_color_from_hex('#26283A')
+                FloatLayout:
+                    id: search_acc
+                    size_hint: None, None
+                    size: search_loss.size
+                    pos: search_loss.x, search_loss.y + search_loss.height + 10
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#26283A')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [0, 5, 5, 0]
+                FloatLayout:
+                    pos: search_acc.x + 10, search_acc.y
+                    size_hint: None, None
+                    size: search_acc.size                    
+                    MDLabel:
+                        id: search_acc_label
+                        pos_hint: {'x': 1, 'center_y': .5}
+                        text: '-'
+                        markup: True
+                        font_size: self.width * .02 + 14
+                        halign: 'left'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/PretendardVariable.ttf'
+                FloatLayout:
+                    id: search_val_acc_head
+                    size_hint: None, None
+                    size: search_loss_head.size
+                    pos: search_val_loss_head.x, search_acc_head.y
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#16A364')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [5, 0, 0, 5]
+                    MDIcon:
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        halign: "center"
+                        icon: "magnify"
+                        theme_text_color: 'Custom'
+                        text_color: utils.get_color_from_hex('#26283A')
+                FloatLayout:
+                    id: search_val_acc
+                    size_hint: None, None
+                    size: search_loss.size
+                    pos: search_val_loss.x, search_acc.y
+                    canvas.before:
+                        Color:
+                            rgba: utils.get_color_from_hex('#26283A')
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [0, 5, 5, 0]
+                FloatLayout:
+                    pos: search_val_acc.x + 10, search_val_acc.y
+                    size_hint: None, None
+                    size: search_val_acc.size                    
+                    MDLabel:
+                        pos_hint: {'x': 1, 'center_y': .5}
+                        id: search_val_acc_label
+                        text: '-'
+                        markup: True
+                        font_size: self.width * .02 + 14
+                        halign: 'left'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'assets/fonts/PretendardVariable.ttf'
+            FloatLayout:
+                id: search_bar
+                size_hint: None, None
+                size: (base_canvas.width - 60)/5 * 1.5, 60
+                pos: 20, search_result_base.y + search_result_base.height + 10
+                canvas.before:
+                    Color:
+                        rgba: utils.get_color_from_hex('#26283A')
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [5, 5, 5, 5]
+                MDTextField:
+                    id: search_text_field
+                    pos_hint: {'center_x': .5, 'center_y': 0.4}
+                    size_hint_x: .9
+                    hint_text: "epochs"
+                    fill_color: 0, 0, 0, .4
+                    icon_right: "magnify"
+                    icon_right_color: app.theme_cls.primary_color
+                    multiline: False
+                    on_text_validate: app.search_value_via_index()
+        FloatLayout:
+            id: hover_graph_canvas_base
+            size_hint: None, None
+            size: (base_canvas.width - 60)/5 * 3.5 , base_canvas.height - 120
+            pos: data_canvas_base.x + data_canvas_base.width + 20, 20
+            HoverGraph:
+                id: loss_hover_graph
+                size_hint: None, None
+                size: hover_graph_canvas_base.width, (hover_graph_canvas_base.height - 20) / 2
+                pos: hover_graph_canvas_base.pos
+            HoverGraph:
+                id: acc_hover_graph
+                size_hint: None, None
+                size: hover_graph_canvas_base.width, (hover_graph_canvas_base.height - 20) / 2
+                pos: loss_hover_graph.x, loss_hover_graph.y + loss_hover_graph.height + 20
 
 <EpochSetting>
     orientation: 'vertical'

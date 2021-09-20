@@ -1,91 +1,60 @@
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
-from kivy.graphics import Color, Line
+from kivy.graphics import Color, Line, Ellipse, Triangle
 from kivymd.app import MDApp
+from kivy.lang import Builder
 from kivymd.uix.behaviors import HoverBehavior
 from kivymd.theming import ThemableBehavior
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy import utils
 from kivy_garden.graph import Graph, LinePlot
-from kivy.uix.boxlayout import BoxLayout
 
 
 class DashboardScreen(Screen):
     def __init__(self, **kwargs):
         super(DashboardScreen, self).__init__(**kwargs)
-        self.hover_graph = HoverGraph()
-        self.ids.hover_graph_canvas.add_widget(self.hover_graph)
-        self.ids.toolbar.ids.label_title.font_name = 'asset/fonts/KOTRA_BOLD.ttf'
-        self.ids.toolbar.ids.label_title.font_size = 26
-        self.ids.toolbar.ids.label_title.pos_hint = {'center_x': .5, 'center_y': .5}
 
 
 class HoverGraph(FloatLayout, ThemableBehavior, HoverBehavior):
-    def __init__(self, epoch=500, **kwargs):
+    def __init__(self, **kwargs):
         super(HoverGraph, self).__init__(**kwargs)
         Window.bind(mouse_pos=self.mouse_pos)
         self.enter_flag = False
         self.touch_flag = False
-        self.epoch = epoch
+        self.epoch = 500
         self.current_epoch = 0
-
-        self.graph = Graph(x_ticks_minor=5, x_ticks_major=self.epoch / 10, y_ticks_major=1.5 / 6, y_grid_label=True, x_grid_label=True,
-                           border_color=(0, 0, 0, 0), tick_color=(0, 0, 0, .5), font_size=12, padding=10,
-                           label_options={'color': utils.get_color_from_hex('#000000FF'), 'font_name': 'asset/fonts/PretendardVariable.ttf'},
-                           x_grid=False, y_grid=True, xmin=0, xmax=self.epoch, ymin=0, ymax=1.5, draw_border=False)
-
-        self.accuracy_plot = LinePlot(color=utils.get_color_from_hex('#3B689BCC'), line_width=1.2)
-        self.val_accuracy_plot = LinePlot(color=utils.get_color_from_hex('#16A364CC'), line_width=1.2)
-        self.loss_plot = LinePlot(color=utils.get_color_from_hex('##FC444FCC'), line_width=1.2)
-        self.val_loss_plot = LinePlot(color=utils.get_color_from_hex('#F5AA31CC'), line_width=1.2)
-        self.accuracy_plot.points = [(0, 0)]
-        self.val_accuracy_plot.points = [(0, 0)]
-        self.loss_plot.points = [(0, 0)]
-        self.val_loss_plot.points = [(0, 0)]
-
-        self.graph.add_plot(self.accuracy_plot)
-        self.graph.add_plot(self.val_accuracy_plot)
-        self.graph.add_plot(self.loss_plot)
-        self.graph.add_plot(self.val_loss_plot)
-        self.ids.graph_plot.add_widget(self.graph)
-
-        self.half_graph_padding = self.graph.padding / 2
-        self.ids.tooltips.opacity = 0
-
-        self.plot_dict = {0: [self.accuracy_plot, '[color=3B689B]●[/color] Acc: ', self.ids.accuracy_tip],
-                          1: [self.loss_plot, '[color=fc444f]●[/color] Loss: ', self.ids.loss_tip],
-                          2: [self.val_accuracy_plot, '[color=16A364]●[/color] ValAcc: ', self.ids.val_accuracy_tip],
-                          3: [self.val_loss_plot, '[color=f5aa31]●[/color] ValLoss: ', self.ids.val_loss_tip]}
-
-        self.offset_x = 10
-        self.offset_y = 10
+        self.value_plot = None
+        self.value_validation_plot = None
+        self.plot_dict = {}
 
     def draw_line(self, mouse_pos):
-        graph_x_start = self.offset_x + self.graph.view_pos[0]
-        graph_x_end = graph_x_start + self.graph.view_size[0]
-        graph_y_start = self.offset_y + self.graph.view_pos[1]
-        graph_y_end = graph_y_start + self.graph.view_size[1]
-
+        graph_x_start = self.x + self.ids.graph.view_pos[0]
+        graph_x_end = graph_x_start + self.ids.graph.view_size[0]
+        graph_y_start = self.y + self.ids.graph.view_pos[1]
+        graph_y_end = graph_y_start + self.ids.graph.view_size[1]
         if (graph_x_start <= mouse_pos[0] <= graph_x_end) and (graph_y_start <= mouse_pos[1] <= graph_y_end):
             self.ids.hover_plot.canvas.clear()
             Window.set_system_cursor('crosshair')
-            step = self.graph.view_size[0] / self.epoch
+            step = self.ids.graph.view_size[0] / self.epoch
             with self.ids.hover_plot.canvas:
                 idx = round((mouse_pos[0] - graph_x_start) / step)
+                if idx == 0:
+                    idx = 1
                 if idx <= self.current_epoch:
                     if self.touch_flag:
                         for value in self.plot_dict.values():
-                            y_len = ((value[0].points[idx][1] * self.graph.view_size[1]) / self.graph.ymax) + graph_y_start
-                            x_len = (step * idx) + graph_x_start
-                            if self.graph.ymin <= value[0].points[idx][1] <= self.graph.ymax:
-                                Color(.15, .15, .15, .8)
-                                Line(circle=(x_len, y_len, 3), width=1.5)
-                            value[2].text = value[1] + str(round(value[0].points[idx][1], 6))
+                            y_pos = ((value['plot'].points[idx - 1][1] * self.ids.graph.view_size[1]) / self.ids.graph.ymax) + graph_y_start
+                            x_pos = (step * idx) + graph_x_start
+                            if self.ids.graph.ymin <= value['plot'].points[idx - 1][1] <= self.ids.graph.ymax:
+                                Color(.85, .85, .85, .8)
+                                Line(circle=(x_pos, y_pos, 2.5), width=1.25)
+                            value['tooltip'].text = value['index_prefix'] + str(round(value['plot'].points[idx - 1][1], 6))
                         if idx < self.epoch * .85:
                             self.ids.tooltips.pos = (mouse_pos[0] + 15, mouse_pos[1] - 55)
                         else:
                             self.ids.tooltips.pos = (mouse_pos[0] - self.ids.tooltips.width - 15, mouse_pos[1] - 55)
-                        self.ids.idx_legend_label.text = 'Index: ' + str(idx)
+                        self.ids.idx_legend_label.text = str(idx)
                         self.ids.tooltips.opacity = 1
                         self.ids.idx_legend.opacity = 1
                         self.ids.legend.opacity = 0
@@ -93,7 +62,6 @@ class HoverGraph(FloatLayout, ThemableBehavior, HoverBehavior):
                     self.ids.tooltips.opacity = 0
                     self.ids.idx_legend.opacity = 0
                     self.ids.legend.opacity = 1
-
                 Color(0, 0, 0, .5)
                 Line(points=[mouse_pos[0], graph_y_start, mouse_pos[0], graph_y_end], width=1)
         else:
@@ -128,40 +96,6 @@ class HoverGraph(FloatLayout, ThemableBehavior, HoverBehavior):
         Window.set_system_cursor('arrow')
         self.enter_flag = False
 
-    def not_validation(self):
-        self.plot_dict.clear()
-        self.plot_dict = {0: [self.accuracy_plot, '[color=3B689B]●[/color] Acc: ', self.ids.accuracy_tip],
-                          1: [self.loss_plot, '[color=fc444f]●[/color] Loss: ', self.ids.loss_tip]}
-
-        self.ids.legend_val_acc.text_color = utils.get_color_from_hex('#CCCCCCCC')
-        self.ids.legend_val_loss.text_color = utils.get_color_from_hex('#CCCCCCCC')
-
-        self.ids.legend_val_acc.text = '[color=16A364]✖[/color] Val Accuracy'
-        self.ids.legend_val_loss.text = '[color=f5aa31]✖[/color] Val Loss'
-
-        self.ids.tooltips.remove_widget(self.ids.val_accuracy_tip)
-        self.ids.tooltips.remove_widget(self.ids.val_loss_tip)
-
-        self.ids.tooltips.height = self.ids.tooltips.height / 2
-
-    def reset(self):
-        self.plot_dict.clear()
-        self.plot_dict = {0: [self.accuracy_plot, '[color=3B689B]●[/color] Acc: ', self.ids.accuracy_tip],
-                          1: [self.loss_plot, '[color=fc444f]●[/color] Loss: ', self.ids.loss_tip],
-                          2: [self.val_accuracy_plot, '[color=16A364]●[/color] ValAcc: ', self.ids.val_accuracy_tip],
-                          3: [self.val_loss_plot, '[color=f5aa31]●[/color] ValLoss: ', self.ids.val_loss_tip]}
-
-        self.ids.legend_val_acc.text_color = utils.get_color_from_hex('#FFFFFFFF')
-        self.ids.legend_val_loss.text_color = utils.get_color_from_hex('#FFFFFFFF')
-
-        self.ids.legend_val_acc.text = '[color=16A364]●[/color] Val Accuracy'
-        self.ids.legend_val_loss.text = '[color=f5aa31]●[/color] Val Loss'
-
-        self.ids.tooltips.add_widget(self.ids.val_accuracy_tip)
-        self.ids.tooltips.add_widget(self.ids.val_loss_tip)
-
-        self.ids.tooltips.height = self.ids.tooltips.height * 2
-
 
 class EpochSetting(BoxLayout):
     pass
@@ -179,6 +113,10 @@ if __name__ == '__main__':
             self.sm.add_widget(self.dashboard_screen)
 
         def build(self):
+            self.dashboard_screen.ids.loss_hover_graph.ids.tooltips.opacity = 0
+            self.dashboard_screen.ids.loss_hover_graph.ids.idx_legend.opacity = 0
+            self.dashboard_screen.ids.acc_hover_graph.ids.tooltips.opacity = 0
+            self.dashboard_screen.ids.acc_hover_graph.ids.idx_legend.opacity = 0
             return self.sm
 
 

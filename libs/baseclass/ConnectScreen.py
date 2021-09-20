@@ -35,6 +35,7 @@ class ConnectScreen(Screen):
         self._thread.start()
 
     def connect_press(self):
+        self.ids.using_account_check_box.unselected_color = utils.get_color_from_hex('#607D8B')
         if self.ids.using_account_check_box.active:
             if not len(self.ids.user_id.text) or not len(self.ids.user_passwd.text):
                 self.dialog.text = 'Enter your user ID or password'
@@ -64,7 +65,6 @@ class ConnectScreen(Screen):
             self.ids.broker_ip.disabled = True
             self.ids.broker_port.disabled = True
             self.ids.using_account_check_box.disabled = True
-            Clock.schedule_once(self.change_widget_color)
             self.ids.connect_button.text = 'Cancel'
 
         else:
@@ -75,22 +75,20 @@ class ConnectScreen(Screen):
             self.ids.broker_ip.disabled = False
             self.ids.broker_port.disabled = False
             self.ids.using_account_check_box.disabled = False
-            Clock.schedule_once(self.change_widget_color)
             self.ids.connect_button.text = 'Connect'
 
-    def check_press(self, widget):
+    def check_press(self):
+        self.ids.using_account_check_box.unselected_color = utils.get_color_from_hex('#607D8B')
         if self.ids.using_account_check_box.active:
             animate = Animation(pos_hint={'center_x': .5, 'center_y': .5}, duration=.2)
             animate.start(self.ids.option_text_field_2)
             animate = Animation(size=(0, 450), duration=.2)
             animate += Animation(size=(400, 450), duration=.2)
-            animate.start(widget)
+            animate.start(self.ids.option_text_field_1)
             self.ids.user_id.disabled = False
             self.ids.user_passwd.disabled = False
             self.ids.user_id.hint_text = 'Enter Your ID'
             self.ids.user_passwd.hint_text = 'Enter Your Password'
-            self.ids.user_id.line_color_focus = utils.get_color_from_hex('#158585FF')
-            self.ids.user_passwd.line_color_focus = utils.get_color_from_hex('#158585FF')
         else:
             self.ids.user_id.disabled = True
             self.ids.user_passwd.disabled = True
@@ -99,15 +97,14 @@ class ConnectScreen(Screen):
             self.ids.user_id.hint_text = ''
             self.ids.user_passwd.hint_text = ''
             animate = Animation(size=(0, 0), duration=.2)
-            animate.start(widget)
+            animate.start(self.ids.option_text_field_1)
             animate = Animation(pos_hint={'center_x': .5, 'center_y': .65}, duration=.2)
             animate.start(self.ids.option_text_field_2)
             self.ids.spinner.active = False
 
-    def subscribe_press(self, arg):
-        epoch = 0
+    def subscribe_press(self, args):
         try:
-            epoch = int(self.ids.epoch.text)
+            int(self.ids.epoch.text)
             if not len(self.ids.mqtt_topic.text):
                 self.dialog.text = 'Enter Your MQTT Topic'
                 self.dialog.open()
@@ -146,33 +143,39 @@ class ConnectScreen(Screen):
                     self.ids.option_text_field_2.remove_widget(self.ids.explain_label)
 
                     _btn = MDFillRoundFlatButton(text='Subscribe', font_size=16, pos_hint={'center_x': .5, 'center_y': .15}, size_hint_x=.4,
-                                                 theme_background_color='Custom', md_bg_color=utils.get_color_from_hex('#1EB9B9FF'),
+                                                 theme_text_color='Custom', text_color=utils.get_color_from_hex('#26283A'),
                                                  on_release=self.subscribe_press)
 
                     self.ids.base_Float.add_widget(_btn)
                     animate = Animation(size=(630, 270), duration=.3)
                     animate.start(self.ids.mqtt_topic_wrapper)
+                    self.ids.mqtt_topic.disabled = False
+                    self.ids.epoch.disabled = False
                     self.ids.mqtt_topic.hint_text = 'Enter your MQTT Topic'
-                    self.ids.mqtt_topic.line_color_focus: utils.get_color_from_hex('#158585FF')
+                    self.ids.mqtt_topic.focus = True
                     self.ids.epoch.hint_text = 'Enter Epochs'
-                    self.ids.epoch.line_color_focus: utils.get_color_from_hex('#158585FF')
                 elif response.response_state == DMRes_state.CONNECT_CANCEL:
                     print('CONNECTION REQUEST CANCEL')
                     pass
                 elif response.response_state == DMRes_state.CONNECT_FAIL:
-                    self.dialog.text = '"[font="/asset/fonts/tway_air.ttf"]' + str(response.error_log) + '[/font]'
+                    self.dialog.text = '[font=./assets/fonts/tway_air.ttf]' + str(response.error_log) + '[/font]'
                     self.dialog.open()
+                    self.ids.using_account_check_box.unselected_color = utils.get_color_from_hex('#607D8B')
+                    self.ids.spinner.active = False
+                    self.ids.user_id.disabled = False
+                    self.ids.user_passwd.disabled = False
+                    self.ids.broker_ip.disabled = False
+                    self.ids.broker_port.disabled = False
+                    self.ids.using_account_check_box.disabled = False
+                    self.ids.connect_button.text = 'Connect'
                     pass
                 else:
                     raise ValueError
             else:
                 sleep(.1)
 
-    def change_widget_color(self, arg):
-        self.ids.user_id.line_color_focus = utils.get_color_from_hex('#158585FF')
-        self.ids.user_passwd.line_color_focus = utils.get_color_from_hex('#158585FF')
-        self.ids.broker_ip.line_color_focus = utils.get_color_from_hex('#158585FF')
-        self.ids.broker_port.line_color_focus = utils.get_color_from_hex('#158585FF')
-
     def dialog_dismiss(self, arg):
         self.dialog.dismiss()
+        self.ids.using_account_check_box.unselected_color = utils.get_color_from_hex('#607D8B')
+
+
