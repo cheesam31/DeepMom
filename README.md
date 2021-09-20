@@ -8,7 +8,7 @@ DeepMom is a simple keras framework monitoring tool using the MQTT protocol.
 
 ## Description
 
-![Architecture](D:\Workspace\Python\DeepMom\README\Architecture.png)
+![Architecture](./README/Architecture.png)
 
 The system architecture is very simple. DeepMom connects to the MQTT broker and subscribes to a topic predefined by the user. The Keras framework also publishes learning results at the end of every epoch after connecting to the MQTT broker using a custom callback. 
 
@@ -48,13 +48,13 @@ How to use DeepMom is as follows.
 
 First, users need to connect DeepMom to a private broker like Mosquitto or a public broker like HiveMQ.  If you press Enter without entering anything, you will be connected to port 1883 on localhost.
 
-![connection_page](D:\Workspace\Python\DeepMom\README\connection_page.png)
+![connection_page](./README/connection_page.png)
 
 If you want to input ID and password using TLS provided by phao-mqtt, check the checkbox.	
 
 After that, the user defines the user's topic and sets the deeplearning training epoch (the epoch must be an integer).
 
-![topic_page](D:\Workspace\Python\DeepMom\README\topic_page.png)
+![topic_page](./README/topic_page.png)
 
 ### Keras Side
 
@@ -96,7 +96,7 @@ model.fit(X_train, Y_train, epochs=epochs, batch_size=batch_size, validation_dat
 
 As mentioned above, DeepMom does not provide as many features as Tensorboad, but only shows the loss, accuracy, validation loss, and validation accuracy for every epoch
 
-![UI](D:\Workspace\Python\DeepMom\README\UI.PNG)
+![UI](./README/UI.PNG)
 
 If you want to know the value by index, click the mouse and move the cursor to the graph.
 
