@@ -14,10 +14,6 @@ from .DeepMomRequestResponse import DeepMomRequest as DMReq
 from .DeepMomRequestResponse import DeepMomRequestState as DMReq_state
 
 
-class BaseShadowWidget(RoundedRectangularElevationBehavior, MDBoxLayout):
-    pass
-
-
 class ConnectScreen(Screen):
     def __init__(self, in_queue, out_queue, **kwargs):
         super(ConnectScreen, self).__init__(**kwargs)
