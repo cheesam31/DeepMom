@@ -23,7 +23,7 @@ DeepMom can be installed using PIP. Therefore, Python and PIP must be installed 
 First clone or download This Project.
 
 ```bash
-git clone git@github.com:cheesam31/DeepMom.git /path/your/workspace
+https://github.com/cheesam31/DeepMom.git /path/your/workspace
 ```
 
 Second create virtual environment.
@@ -50,7 +50,7 @@ First, users need to connect DeepMom to a private broker like Mosquitto or a pub
 
 ![connection_page](./README/connection_page.png)
 
-If you want to input ID and password using TLS provided by phao-mqtt, check the checkbox.	
+If you want to input ID and password using TLS provided by paho-mqtt, check the checkbox.	
 
 After that, the user defines the user's topic and sets the deeplearning training epoch (the epoch must be an integer).
 
