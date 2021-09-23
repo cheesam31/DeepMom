@@ -212,6 +212,9 @@ class DeepMomApp(MDApp):
             _value['best'].text = self.wrap_color(_value['color'], '● ') + '-'
 
         self._current_epoch = 0
+        self._dashboard_screen.ids.acc_hover_graph.current_epoch = 0
+        self._dashboard_screen.ids.loss_hover_graph.current_epoch = 0
+        
         self._dashboard_screen.ids.progress_bar.value = 0
         self._dashboard_screen.ids.current_epoch_label.text = '0 / {}'.format(self._epoch)
         self._dashboard_screen.ids.percent_epoch_label.text = '00.00%'
