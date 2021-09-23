@@ -16,9 +16,7 @@ DeepMom and deeplearning servers are transparent to each other and only send and
 
 ## Install
 
-DeepMom can be installed using PIP. Therefore, Python and PIP must be installed on your PC.  If you have Python and PIP ready, just follow the procedure below.
-
-
+DeepMom requires Python and PIP. So, you need to have Python and PIP installed on your PC. If you have Python and PIP ready, follow the procedure below.
 
 First clone or download This Project.
 
