@@ -278,8 +278,6 @@ class DeepMomApp(MDApp):
                                                             '/ {:.3f} [size=12]epoch per sec[/size]'.format(round(self.time_freq.total_seconds(), 3))
 
     def widget_init(self, arg):
-        self._connect_screen.ids.broker_ip.focus = True
-
         self._dashboard_screen.ids.loss_hover_graph.value_plot = LinePlot(color=utils.get_color_from_hex('#FC444FFF'), line_width=1.2)
         self._dashboard_screen.ids.loss_hover_graph.value_validation_plot = LinePlot(color=utils.get_color_from_hex('#F5AA31D9'), line_width=1.2)
         self._dashboard_screen.ids.acc_hover_graph.value_plot = LinePlot(color=utils.get_color_from_hex('#3B689BFF'), line_width=1.2)
@@ -390,6 +388,7 @@ class DeepMomApp(MDApp):
         self.theme_cls.theme_style = 'Dark'
         self._connection_damon_thread.start()
         self._scree_manager.current = 'connect'
+        self._connect_screen.ids.broker_ip.focus = True
         Clock.schedule_once(self.widget_init)
         Clock.schedule_interval(self.estimated_time_arrival_clock, 1)
         return self._scree_manager
